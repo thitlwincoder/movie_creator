@@ -1,0 +1,16 @@
+name: moviepy_flutter
+description: A Very Good Project created by Very Good CLI.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  ffmpeg_kit_flutter_full: ^6.0.3-LTS
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  very_good_analysis: ^5.1.0

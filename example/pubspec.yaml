@@ -7,6 +7,8 @@ environment:
   sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
+  file_picker: ^6.1.1
+  file_saver: ^0.2.11
   flutter:
     sdk: flutter
 
@@ -21,3 +23,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/big_buck_bunny_0_30.webm

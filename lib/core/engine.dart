@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/core/core.dart';
 
@@ -12,9 +12,7 @@ class _Engine {
 
   final Execs _execs;
 
-  Future<Stream<List<int>>> executeStream({
-    required List<String> commands,
-  }) async {
+  Future<Stream<List<int>>> executeStream(List<String> commands) async {
     if (Platform.isAndroid || Platform.isIOS) {
       switch (_execs) {
         case Execs.ffmpeg:
@@ -49,9 +47,7 @@ class _Engine {
     }
   }
 
-  Future<String> execute({
-    required List<String> commands,
-  }) async {
+  Future<String> execute(List<String> commands) async {
     if (Platform.isAndroid || Platform.isIOS) {
       switch (_execs) {
         case Execs.ffmpeg:
@@ -59,6 +55,28 @@ class _Engine {
           return (await session.getOutput())!;
         case Execs.ffprobe:
           final session = await FFprobeKit.execute(commands.join(' '));
+          return (await session.getOutput())!;
+        case Execs.ffplay:
+          throw MissingPluginException('FFplay not available.');
+      }
+    } else {
+      final process = await Process.run(_execs.name, commands);
+
+      if (process.exitCode == 1) {
+        throw EngineException(process.stderr);
+      }
+      return '${process.stdout}';
+    }
+  }
+
+  Future<String> executeAsync(List<String> commands) async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      switch (_execs) {
+        case Execs.ffmpeg:
+          final session = await FFmpegKit.executeAsync(commands.join(' '));
+          return (await session.getOutput())!;
+        case Execs.ffprobe:
+          final session = await FFprobeKit.executeAsync(commands.join(' '));
           return (await session.getOutput())!;
         case Execs.ffplay:
           throw MissingPluginException('FFplay not available.');

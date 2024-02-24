@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
+import 'package:moviepy_flutter/moviepy_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +27,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({required this.title, super.key});
 
   final String title;
 
@@ -33,10 +39,33 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: onPressed,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Future<void> onPressed() async {
+    final file = await pickFile();
+
+    final img = await VideoFileClip(file!).getFrame(Duration(seconds: 5));
+
+    await saveFile('Osumffmpeg Frame', img.bytes);
+  }
+
+  Future<File?> pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return null;
+    return File(result.files.single.path!);
+  }
+
+  Future<String?> saveFile(String name, Uint8List bytes) {
+    return FileSaver.instance.saveAs(
+      name: name,
+      ext: 'jpg',
+      bytes: bytes,
+      mimeType: MimeType.jpeg,
     );
   }
 }

@@ -83,8 +83,3 @@ String _getPositions(Alignment align, int padding) {
   if (align == Alignment.bottomRight) return 'x=w-tw-$padding:y=h-th-$padding';
   return 'x=(w-text_w)/2:y=(h-text_h)/2';
 }
-
-String toHex(Color color) {
-  String format(int v) => v.toRadixString(16).padLeft(2, '0');
-  return '0x${format(color.red)}${format(color.green)}${format(color.blue)}';
-}

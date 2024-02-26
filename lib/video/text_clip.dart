@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Alignment, Colors, EdgeInsets;
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
 import 'package:path/path.dart' as p;
@@ -11,22 +11,22 @@ class TextClip extends ImageClip {
   TextClip(
     this.text, {
     required this.duration,
+    this.style,
     this.rate = 30,
-    this.size = const Size(320, 240),
-    this.color = Colors.black,
-    this.textStyle,
-    this.padding,
-    this.align = Alignment.center,
-  }) : super(File('path'));
+    this.padding = EdgeInsets.zero,
+    this.size = const Size(720, 480),
+    this.color = Colors.transparent,
+  }) : super(File('path')) {
+    style ??= TextClipStyle();
+  }
 
   final String text;
-  final Color color;
   final Size size;
   final int rate;
+  final Color color;
   final Duration duration;
-  final TextStyle? textStyle;
-  final int? padding;
-  final Alignment align;
+  TextClipStyle? style;
+  final EdgeInsets padding;
 
   @override
   Future<void> writeVideoFile(File output) async {
@@ -44,26 +44,34 @@ class TextClip extends ImageClip {
 
     final sizeFormat = '${size.width.toInt()}x${size.height.toInt()}';
 
-    final fontColor = textStyle?.color ?? Colors.white;
-    final fontSize = textStyle?.fontSize?.toInt() ?? 24;
+    final position = _getPositions();
 
-    final position = _getPositions(align, padding ?? 0);
+    // final drawtext = 'drawtext='
+    //     'text="$text":'
+    //     'fontcolor=${fontcolor.toHex}:'
+    //     'fontsize=$fontSize:'
+    //     '$position:'
+    //     'fontfile=${file.path}:'
+    //     'box=1:'
+    //     'boxcolor=${Colors.red.toHex}';
 
     final cmd = [
       '-f',
       'lavfi',
       '-i',
       'color='
-          'c=${toHex(color)}:'
+          'c=${color.toHex}:'
           's=$sizeFormat:'
           'r=$rate',
       '-vf',
-      'drawtext='
-          'text="$text":'
-          'fontcolor=${toHex(fontColor)}:'
-          'fontsize=$fontSize:'
-          '$position:'
-          'fontfile=${file.path}',
+      drawtext(
+        text,
+        fontcolor: style?.color ?? Colors.white,
+        fontsize: style?.fontSize ?? 24,
+        position: position,
+        fontfile: file.path,
+        bgcolor: style?.backgroundColor,
+      ),
       '-t',
       '${duration.inSeconds}',
       output.path,
@@ -72,14 +80,22 @@ class TextClip extends ImageClip {
 
     await ffmpeg.execute(cmd);
   }
-}
 
-String _getPositions(Alignment align, int padding) {
-  if (align == Alignment.topLeft) return 'x=$padding:y=$padding';
-  if (align == Alignment.topCenter) return 'x=(w-text_w)/2:y=$padding';
-  if (align == Alignment.topRight) return 'x=w-tw-$padding:y=$padding';
-  if (align == Alignment.bottomLeft) return 'x=$padding:y=h-th-$padding';
-  if (align == Alignment.bottomCenter) return 'x=(w-text_w)/2:y=h-th-$padding';
-  if (align == Alignment.bottomRight) return 'x=w-tw-$padding:y=h-th-$padding';
-  return 'x=(w-text_w)/2:y=(h-text_h)/2';
+  String _getPositions() {
+    final t = padding.top.toInt();
+    final b = padding.bottom.toInt();
+    final l = padding.left.toInt();
+    final r = padding.right.toInt();
+
+    final align = style?.align;
+
+    if (align == Alignment.topLeft) return 'x=$l:y=$t';
+    if (align == Alignment.topCenter) return 'x=(w-text_w)/2:y=$t';
+    if (align == Alignment.topRight) return 'x=w-tw-$r:y=$t';
+    if (align == Alignment.bottomLeft) return 'x=$l:y=h-th-$b';
+    if (align == Alignment.bottomCenter) return 'x=(w-text_w)/2:y=h-th-$b';
+    if (align == Alignment.bottomRight) return 'x=w-tw-$r:y=h-th-$b';
+
+    return 'x=(w-text_w)/2:y=(h-text_h)/2';
+  }
 }

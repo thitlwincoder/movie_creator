@@ -17,7 +17,6 @@ class Clip {
     final dir = await getTemporaryDirectory();
 
     final temp = File(p.join(dir.path, name));
-    // await temp.create();
 
     await ffmpeg.execute([
       '-an',

@@ -1,3 +1,5 @@
+export 'cmd/cmd.dart';
+export 'color_clip.dart';
 export 'image_clip.dart';
 export 'io/io.dart';
 export 'text_clip.dart';

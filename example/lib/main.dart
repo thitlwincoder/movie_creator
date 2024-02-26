@@ -24,6 +24,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -161,12 +164,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final file = File(p.join(dir!, 'text_clip.mp4'));
 
+    TextStyle();
+
     final textClip = TextClip(
       controller.text.trim(),
-      size: Size(720, 720),
-      align: alignment,
-      padding: 20,
+      color: Colors.green,
+      padding: EdgeInsets.all(20),
       duration: Duration(seconds: 10),
+      style: TextClipStyle(
+        fontSize: 50,
+        align: alignment,
+        // backgroundColor: Colors.red,
+      ),
     );
 
     await textClip.writeVideoFile(file);

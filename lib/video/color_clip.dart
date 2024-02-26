@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:moviepy_flutter/moviepy_flutter.dart'
-    show ImageClip, ffmpeg, toHex;
+    show ColorExt, ImageClip, ffmpeg;
 
 class ColorClip extends ImageClip {
   ColorClip(
@@ -26,7 +26,7 @@ class ColorClip extends ImageClip {
       'lavfi',
       '-i',
       'color='
-          'c=${toHex(color)}:'
+          'c=${color.toHex}:'
           's=$sizeFormat:'
           'r=$rate',
       '-t',

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 
@@ -28,33 +29,99 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({required this.title, super.key});
 
   final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final controller = TextEditingController();
+  Alignment alignment = Alignment.center;
+
+  @override
+  void initState() {
+    super.initState();
+    [
+      Permission.storage,
+      Permission.manageExternalStorage,
+      Permission.videos,
+    ].request();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
+        title: Text(widget.title),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: onPressed,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      body: ListView(
+        padding: EdgeInsets.all(20),
+        children: [
+          TextFormField(
+            controller: controller,
+          ),
+          ListTile(
+            title: Text('Alignment'),
+            trailing: DropdownButton(
+              value: alignment,
+              items: const [
+                DropdownMenuItem(
+                  value: Alignment.center,
+                  child: Text('Center'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.topLeft,
+                  child: Text('Top Left'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.topCenter,
+                  child: Text('Top Center'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.topRight,
+                  child: Text('Top Right'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.bottomLeft,
+                  child: Text('Bottom Left'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.bottomCenter,
+                  child: Text('Bottom Center'),
+                ),
+                DropdownMenuItem(
+                  value: Alignment.bottomRight,
+                  child: Text('Bottom Right'),
+                ),
+              ],
+              onChanged: (value) {
+                alignment = value!;
+                setState(() {});
+              },
+            ),
+          ),
+          SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: textClip,
+            child: Text('Export'),
+          )
+        ],
       ),
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: onPressed,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 
   Future<void> onPressed() async {
-    await [
-      Permission.storage,
-      Permission.manageExternalStorage,
-      Permission.videos,
-    ].request();
-
     await textClip();
 
     // final clip = VideoFileClip(file!);
@@ -95,10 +162,15 @@ class MyHomePage extends StatelessWidget {
     final file = File(p.join(dir!, 'text_clip.mp4'));
 
     final textClip = TextClip(
-      'Hello World',
+      controller.text.trim(),
       size: Size(720, 720),
+      align: alignment,
+      padding: 20,
+      duration: Duration(seconds: 10),
     );
 
     await textClip.writeVideoFile(file);
+
+    await OpenFile.open(file.path);
   }
 }

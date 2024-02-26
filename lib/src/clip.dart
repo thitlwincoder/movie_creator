@@ -17,9 +17,9 @@ class Clip {
     final dir = await getTemporaryDirectory();
 
     final temp = File(p.join(dir.path, name));
-    await temp.create();
+    // await temp.create();
 
-    final cmd = [
+    await ffmpeg.execute([
       '-an',
       '-ss',
       '${position.inSeconds}',
@@ -29,17 +29,11 @@ class Clip {
       '1',
       temp.path,
       '-y',
-    ];
+    ]);
 
-    await ffmpeg.executeAsync(cmd);
+    final data = await temp.readAsBytes();
+    await temp.delete();
 
-    if (temp.existsSync()) {
-      final data = await temp.readAsBytes();
-      await temp.delete();
-
-      return MemoryImage(data);
-    }
-
-    throw const FailedToGetFrameFromMedia(null);
+    return MemoryImage(data);
   }
 }

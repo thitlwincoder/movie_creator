@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:path/path.dart' as p;
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,11 +49,25 @@ class MyHomePage extends StatelessWidget {
   }
 
   Future<void> onPressed() async {
-    final file = await pickFile();
+    await [
+      Permission.storage,
+      Permission.manageExternalStorage,
+      Permission.videos,
+    ].request();
 
-    final img = await VideoFileClip(file!).getFrame(Duration(seconds: 5));
+    await textClip();
 
-    await saveFile('Osumffmpeg Frame', img.bytes);
+    // final clip = VideoFileClip(file!);
+    // await clip.init();
+
+    // print('duration: ${clip.duration}');
+    // print('end: ${clip.frameRate}');
+
+    // final img = await clip.nFrames();
+
+    // print(img);
+
+    // await saveFile('Osumffmpeg Frame', img.bytes);
   }
 
   Future<File?> pickFile() async {
@@ -60,12 +76,29 @@ class MyHomePage extends StatelessWidget {
     return File(result.files.single.path!);
   }
 
+  Future<String?> getDirectoryPath() {
+    return FilePicker.platform.getDirectoryPath();
+  }
+
   Future<String?> saveFile(String name, Uint8List bytes) {
-    return FileSaver.instance.saveAs(
+    return FileSaver.instance.saveFile(
       name: name,
       ext: 'jpg',
       bytes: bytes,
       mimeType: MimeType.jpeg,
     );
+  }
+
+  Future<void> textClip() async {
+    final dir = await getDirectoryPath();
+
+    final file = File(p.join(dir!, 'text_clip.mp4'));
+
+    final textClip = TextClip(
+      'Hello World',
+      size: Size(720, 720),
+    );
+
+    await textClip.writeVideoFile(file);
   }
 }

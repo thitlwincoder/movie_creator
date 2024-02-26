@@ -9,6 +9,7 @@ environment:
 dependencies:
   file_picker: ^6.1.1
   file_saver: ^0.2.11
+  permission_handler: ^11.3.0
   flutter:
     sdk: flutter
 
@@ -26,3 +27,4 @@ flutter:
 
   assets:
     - assets/big_buck_bunny_0_30.webm
+    - assets/Baloo2-Medium.ttf

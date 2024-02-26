@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:async/async.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/core/core.dart';
 
@@ -52,6 +53,7 @@ class _Engine {
       switch (_execs) {
         case Execs.ffmpeg:
           final session = await FFmpegKit.execute(commands.join(' '));
+          log((await session.getAllLogsAsString()) ?? '');
           return (await session.getOutput())!;
         case Execs.ffprobe:
           final session = await FFprobeKit.execute(commands.join(' '));

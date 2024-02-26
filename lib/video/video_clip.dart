@@ -1,4 +1,6 @@
-import 'package:moviepy_flutter/src/clip.dart';
+import 'dart:io';
+
+import 'package:moviepy_flutter/moviepy_flutter.dart' show Clip;
 
 class VideoClip extends Clip {
   VideoClip(super.media);
@@ -32,4 +34,6 @@ class VideoClip extends Clip {
   //     ],
   //   );
   // }
+
+  Future<void> writeVideoFile(File output) async {}
 }

@@ -5,12 +5,10 @@ import 'package:moviepy_flutter/core/core.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class Clip {
-  Clip(this.media);
+abstract class Clip {
+  Clip();
 
-  final File media;
-
-  Future<MemoryImage> getFrame(Duration position) async {
+  Future<MemoryImage> getFrame(Duration position, File media) async {
     final name =
         Platform.isAndroid || Platform.isIOS ? 'image.jpg' : 'image.bmp';
 
@@ -35,4 +33,6 @@ class Clip {
 
     return MemoryImage(data);
   }
+
+  Future<void> writeVideoFile(File output);
 }

@@ -1,1 +1,1 @@
-export 'draw_text.dart';
+export 'draw_text_cmd.dart';

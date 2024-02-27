@@ -1,8 +1,17 @@
+import 'dart:io';
+
+import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
+import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class VideoFileClip extends VideoClip {
-  VideoFileClip(super.media);
+  VideoFileClip(
+    this.media, {
+    this.clips = const [],
+  });
 
   String? frameRate;
   String? aspectRatio;
@@ -13,10 +22,14 @@ class VideoFileClip extends VideoClip {
   String? timeBase;
   String? codecType;
 
-  String? duration;
+  double? duration;
   String? startTime;
-  String? endTime;
+  double? endTime;
   String? size;
+
+  final File media;
+
+  final List<TextClip> clips;
 
   Future<void> init() async {
     final session = await FFprobeKit.getMediaInformation(media.path);
@@ -26,7 +39,7 @@ class VideoFileClip extends VideoClip {
     final json = info.getAllProperties() ?? {};
 
     final streams = json['streams'] as List;
-    final stream = streams.first as Map<String, dynamic>;
+    final stream = streams.first as Map;
 
     frameRate = stream['r_frame_rate'] as String?;
     aspectRatio = stream['display_aspect_ratio'] as String?;
@@ -37,12 +50,39 @@ class VideoFileClip extends VideoClip {
     timeBase = stream['time_base'] as String?;
     codecType = stream['codec_type'] as String?;
 
-    final formats = json['format'] as List;
-    final format = formats.first as Map<String, dynamic>;
+    final format = json['format'] as Map;
 
-    duration = format['duration'] as String?;
+    duration = double.parse('${format['duration']}');
     startTime = format['start_time'] as String?;
     endTime = duration;
     size = format['size'] as String?;
+  }
+
+  @override
+  Future<void> writeVideoFile(File output) async {
+    final font = await rootBundle.load('assets/Baloo2-Medium.ttf');
+    final docDir = await getApplicationDocumentsDirectory();
+    final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
+    final file = File(path);
+    await file.create();
+    await file.writeAsBytes(font.buffer.asUint8List(
+      font.offsetInBytes,
+      font.lengthInBytes,
+    ));
+
+    await FFmpegKitConfig.setFontDirectory(file.path);
+
+    final cmd = [
+      '-i',
+      media.path,
+      '-vf',
+      '"${clips.map((e) => e.getDrawtextCMD(file, output)).join(', ')}"',
+      '-c:a',
+      'copy',
+      output.path,
+      '-y'
+    ];
+
+    await ffmpeg.execute(cmd);
   }
 }

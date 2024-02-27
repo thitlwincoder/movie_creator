@@ -2,27 +2,30 @@ import 'dart:ui';
 
 import 'package:moviepy_flutter/moviepy_flutter.dart';
 
-String drawtext(
+String drawtextCMD(
   String text, {
   required Color fontcolor,
   required int fontsize,
   required String position,
   required String fontfile,
   Color? bgcolor,
+  int? start,
+  int? end,
 }) {
   var cmd = <String>[
-    'text="$text"',
+    "text='$text'",
     'fontcolor=${fontcolor.toHex}',
     'fontsize=$fontsize',
     position,
-    'fontfile=$fontfile',
+    "fontfile='$fontfile'",
   ];
 
   if (bgcolor != null) {
-    cmd.addAll([
-      'box=1',
-      'boxcolor=${bgcolor.toHex}',
-    ]);
+    cmd.addAll(['box=1', 'boxcolor=${bgcolor.toHex}']);
+  }
+
+  if (start != null && end != null) {
+    cmd.add('enable=between($start,$end)');
   }
 
   cmd = cmd.toSet().toList();

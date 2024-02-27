@@ -4,29 +4,47 @@ import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart' show Alignment, Colors, EdgeInsets;
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:moviepy_flutter/video/cmd/color_cmd.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class TextClip extends ImageClip {
   TextClip(
     this.text, {
-    required this.duration,
+    this.duration,
     this.style,
     this.rate = 30,
     this.padding = EdgeInsets.zero,
-    this.size = const Size(720, 480),
+    this.size,
     this.color = Colors.transparent,
-  }) : super(File('path')) {
+    this.background,
+  }) {
     style ??= TextClipStyle();
   }
 
   final String text;
-  final Size size;
+  final Size? size;
   final int rate;
   final Color color;
-  final Duration duration;
+  final Duration? duration;
   TextClipStyle? style;
   final EdgeInsets padding;
+  final Clip? background;
+
+  String getDrawtextCMD(File fontfile, File output) {
+    final position = _getPositions();
+
+    return drawtextCMD(
+      text,
+      position: position,
+      fontfile: fontfile.path,
+      end: style?.end?.inSeconds,
+      start: style?.start?.inSeconds,
+      fontsize: style?.fontSize ?? 24,
+      bgcolor: style?.backgroundColor,
+      fontcolor: style?.color ?? Colors.white,
+    );
+  }
 
   @override
   Future<void> writeVideoFile(File output) async {
@@ -34,49 +52,35 @@ class TextClip extends ImageClip {
     final docDir = await getApplicationDocumentsDirectory();
     final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
     final file = File(path);
-    await file.create();
-    await file.writeAsBytes(font.buffer.asUint8List(
-      font.offsetInBytes,
-      font.lengthInBytes,
-    ));
+
+    if (!file.existsSync()) {
+      await file.create();
+      await file.writeAsBytes(font.buffer.asUint8List(
+        font.offsetInBytes,
+        font.lengthInBytes,
+      ));
+    }
 
     await FFmpegKitConfig.setFontDirectory(file.path);
 
-    final sizeFormat = '${size.width.toInt()}x${size.height.toInt()}';
-
-    final position = _getPositions();
-
-    // final drawtext = 'drawtext='
-    //     'text="$text":'
-    //     'fontcolor=${fontcolor.toHex}:'
-    //     'fontsize=$fontSize:'
-    //     '$position:'
-    //     'fontfile=${file.path}:'
-    //     'box=1:'
-    //     'boxcolor=${Colors.red.toHex}';
+    final isBgIsVideo = background is VideoFileClip;
 
     final cmd = [
-      '-f',
-      'lavfi',
+      if (!isBgIsVideo) ...['-f', 'lavfi'],
       '-i',
-      'color='
-          'c=${color.toHex}:'
-          's=$sizeFormat:'
-          'r=$rate',
+      if (isBgIsVideo)
+        '"${(background! as VideoFileClip).media.path}"'
+      else
+        colorCMD(color: color, rate: rate, size: size),
       '-vf',
-      drawtext(
-        text,
-        fontcolor: style?.color ?? Colors.white,
-        fontsize: style?.fontSize ?? 24,
-        position: position,
-        fontfile: file.path,
-        bgcolor: style?.backgroundColor,
-      ),
-      '-t',
-      '${duration.inSeconds}',
+      getDrawtextCMD(file, output),
+      if (duration != null) ...['-t', '${duration!.inSeconds}'],
+      if (isBgIsVideo) ...['-c:a', 'copy'],
       output.path,
       '-y'
     ];
+
+    print(cmd);
 
     await ffmpeg.execute(cmd);
   }

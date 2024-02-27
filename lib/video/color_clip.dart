@@ -10,7 +10,7 @@ class ColorClip extends ImageClip {
     required this.duration,
     this.rate = 30,
     this.size = const Size(320, 240),
-  }) : super(File('path'));
+  });
 
   final Color color;
   final Size size;

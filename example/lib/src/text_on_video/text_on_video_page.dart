@@ -117,7 +117,7 @@ class _TextOnVideoPageState extends State<TextOnVideoPage> {
   }
 
   Future<void> onExport(
-    File video,
+    File media,
     GlobalKey<FormState> formKey,
     TextEditingController controller,
     Alignment alignment,
@@ -126,72 +126,23 @@ class _TextOnVideoPageState extends State<TextOnVideoPage> {
 
     final dir = await getDirectoryPath();
 
-    final file = File(p.join(dir!, 'text_overlay.mp4'));
+    final file = File(p.join(dir!, 'text_overlay.webm'));
 
-    // final videoClip = VideoFileClip(video);
-    // // await videoClip.init();
-
-    // final textClip = TextClip(
-    //   controller.text.trim(),
-    //   background: videoClip,
-    //   padding: EdgeInsets.all(10),
-    //   style: TextClipStyle(
-    //     fontSize: 30,
-    //     align: alignment,
-    //     color: Colors.white,
-    //   ),
-    // );
-
-    final videoClip = VideoFileClip(
-      video,
-      clips: [
-        TextClip(
-          'Channel Myanmar',
-          padding: EdgeInsets.all(10),
-          style: TextClipStyle(align: Alignment.topLeft),
-        ),
-        TextClip(
-          'channelmyanmar.org',
-          padding: EdgeInsets.all(10),
-          style: TextClipStyle(align: Alignment.topRight),
-        ),
-      ],
+    final video1Clip = VideoFileClip(
+      media,
+      subclip: SubClip(duration: Duration(seconds: 5)),
+      layers: [TextClip('Video 1', style: TextClipStyle(fontSize: 40))],
+    );
+    final video2Clip = VideoFileClip(
+      media,
+      subclip: SubClip(duration: Duration(seconds: 5)),
+      layers: [TextClip('Video 2', style: TextClipStyle(fontSize: 40))],
     );
 
-    await videoClip.writeVideoFile(file);
+    final video = CompositeVideoClip([video1Clip, video2Clip]);
+    await video.writeVideoFile(file);
 
     await OpenFile.open(file.path);
-
-    // final videoWithText = CompositeVideoClip([
-    //   videoClip,
-    //   textClip,
-    // ]);
-
-    // await videoWithText.writeVideoFile(file);
-
-    // final cmd = [
-    //   '-i',
-    //   video,
-    //   '-vf',
-    //   drawtextCMD(
-    //     controller.text.trim(),
-    //     fontcolor: fontcolor,
-    //     fontsize: fontsize,
-    //     position: position,
-    //     fontfile: fontfile,
-    //   ),
-    //   // 'drawtext='
-    //   //     'text="${controller.text.trim()}":'
-    //   //     'fontsize=30:'
-    //   //     'fontcolor=white:'
-    //   //     'x=50:'
-    //   //     'y=50',
-    //   '-c:a',
-    //   'copy',
-    //   file.path,
-    // ];
-
-    // await ffmpeg.execute(cmd);
   }
 
   Future<void> onSelectFile(ValueNotifier<File?> video) async {

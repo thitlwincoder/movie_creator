@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart' show Alignment, Colors, EdgeInsets;
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
@@ -11,35 +10,41 @@ import 'package:path_provider/path_provider.dart';
 class TextClip extends ImageClip {
   TextClip(
     this.text, {
-    this.duration,
+    Duration? duration,
     this.style,
     this.rate = 30,
-    this.padding = EdgeInsets.zero,
     this.size,
+    this.start,
+    this.end,
+    this.rotate,
+    this.padding = EdgeInsets.zero,
     this.color = Colors.transparent,
-    this.background,
   }) {
     style ??= TextClipStyle();
+    super.duration = duration;
   }
 
   final String text;
   final Size? size;
   final int rate;
   final Color color;
-  final Duration? duration;
   TextClipStyle? style;
   final EdgeInsets padding;
-  final Clip? background;
+  final int? rotate;
+
+  final Duration? start;
+  final Duration? end;
 
   String getDrawtextCMD(File fontfile, File output) {
     final position = _getPositions();
 
     return drawtextCMD(
       text,
+      rotate: rotate,
       position: position,
       fontfile: fontfile.path,
-      end: style?.end?.inSeconds,
-      start: style?.start?.inSeconds,
+      end: end?.inSeconds,
+      start: start?.inSeconds,
       fontsize: style?.fontSize ?? 24,
       bgcolor: style?.backgroundColor,
       fontcolor: style?.color ?? Colors.white,
@@ -47,42 +52,34 @@ class TextClip extends ImageClip {
   }
 
   @override
-  Future<void> writeVideoFile(File output) async {
-    final font = await rootBundle.load('assets/Baloo2-Medium.ttf');
-    final docDir = await getApplicationDocumentsDirectory();
-    final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
-    final file = File(path);
+  Future<String> save() async {
+    final file = await setFontDirectory();
 
-    if (!file.existsSync()) {
-      await file.create();
-      await file.writeAsBytes(font.buffer.asUint8List(
-        font.offsetInBytes,
-        font.lengthInBytes,
-      ));
-    }
-
-    await FFmpegKitConfig.setFontDirectory(file.path);
-
-    final isBgIsVideo = background is VideoFileClip;
+    final temp = await getTemporaryDirectory();
+    final output = p.join(temp.path, '${DateTime.now().millisecond}.mp4');
 
     final cmd = [
-      if (!isBgIsVideo) ...['-f', 'lavfi'],
+      '-f',
+      'lavfi',
       '-i',
-      if (isBgIsVideo)
-        '"${(background! as VideoFileClip).media.path}"'
-      else
-        colorCMD(color: color, rate: rate, size: size),
+      colorCMD(color: color, rate: rate, size: size),
       '-vf',
-      getDrawtextCMD(file, output),
+      getDrawtextCMD(file, File(output)),
       if (duration != null) ...['-t', '${duration!.inSeconds}'],
-      if (isBgIsVideo) ...['-c:a', 'copy'],
-      output.path,
+      output,
       '-y'
     ];
 
-    print(cmd);
-
     await ffmpeg.execute(cmd);
+
+    return output;
+  }
+
+  @override
+  Future<void> writeVideoFile(File output) async {
+    final temp = await save();
+    await File(temp).copy(output.path);
+    await File(temp).delete();
   }
 
   String _getPositions() {
@@ -91,7 +88,7 @@ class TextClip extends ImageClip {
     final l = padding.left.toInt();
     final r = padding.right.toInt();
 
-    final align = style?.align;
+    final align = style?.alignment;
 
     if (align == Alignment.topLeft) return 'x=$l:y=$t';
     if (align == Alignment.topCenter) return 'x=(w-text_w)/2:y=$t';

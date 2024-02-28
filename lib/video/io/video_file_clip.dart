@@ -1,16 +1,13 @@
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
-import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 class VideoFileClip extends VideoClip {
   VideoFileClip(
     this.media, {
-    this.clips = const [],
+    this.layers,
+    this.subclip,
   });
 
   String? frameRate;
@@ -22,14 +19,15 @@ class VideoFileClip extends VideoClip {
   String? timeBase;
   String? codecType;
 
-  double? duration;
   String? startTime;
-  double? endTime;
+  Duration? endTime;
   String? size;
 
   final File media;
 
-  final List<TextClip> clips;
+  final SubClip? subclip;
+
+  final List<TextClip>? layers;
 
   Future<void> init() async {
     final session = await FFprobeKit.getMediaInformation(media.path);
@@ -52,31 +50,31 @@ class VideoFileClip extends VideoClip {
 
     final format = json['format'] as Map;
 
-    duration = double.parse('${format['duration']}');
+    super.duration =
+        Duration(seconds: double.parse('${format['duration']}').toInt());
     startTime = format['start_time'] as String?;
     endTime = duration;
     size = format['size'] as String?;
   }
 
   @override
-  Future<void> writeVideoFile(File output) async {
-    final font = await rootBundle.load('assets/Baloo2-Medium.ttf');
-    final docDir = await getApplicationDocumentsDirectory();
-    final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
-    final file = File(path);
-    await file.create();
-    await file.writeAsBytes(font.buffer.asUint8List(
-      font.offsetInBytes,
-      font.lengthInBytes,
-    ));
+  Future<String> save() async {
+    return media.path;
+  }
 
-    await FFmpegKitConfig.setFontDirectory(file.path);
+  @override
+  Future<void> writeVideoFile(File output) async {
+    final file = await setFontDirectory();
 
     final cmd = [
       '-i',
       media.path,
-      '-vf',
-      '"${clips.map((e) => e.getDrawtextCMD(file, output)).join(', ')}"',
+      if (layers?.isNotEmpty ?? false) ...[
+        '-vf',
+        '"${layers!.map((e) => e.getDrawtextCMD(file, output)).join(', ')}"',
+      ],
+      if (subclip != null)
+        '-ss ${subclip!.start.inSeconds} -t ${subclip!.duration.inSeconds}',
       '-c:a',
       'copy',
       output.path,

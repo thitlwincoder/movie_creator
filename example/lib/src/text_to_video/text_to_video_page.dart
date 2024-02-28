@@ -107,7 +107,7 @@ class _TextClipPageState extends State<TextToVideoPage> {
       controller.text.trim(),
       padding: EdgeInsets.all(20),
       duration: Duration(seconds: 10),
-      style: TextClipStyle(fontSize: 30, align: alignment),
+      style: TextClipStyle(fontSize: 30, alignment: alignment),
     );
 
     await textClip.writeVideoFile(file);

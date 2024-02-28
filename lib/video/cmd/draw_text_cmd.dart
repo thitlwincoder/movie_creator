@@ -11,6 +11,7 @@ String drawtextCMD(
   Color? bgcolor,
   int? start,
   int? end,
+  int? rotate,
 }) {
   var cmd = <String>[
     "text='$text'",
@@ -25,8 +26,10 @@ String drawtextCMD(
   }
 
   if (start != null && end != null) {
-    cmd.add('enable=between($start,$end)');
+    cmd.add("enable='between(t,$start,$end)'");
   }
+
+  if (rotate != null) cmd.add('rotate=$rotate');
 
   cmd = cmd.toSet().toList();
 

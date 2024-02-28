@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart' show Alignment, Colors, EdgeInsets;
 import 'package:flutter/services.dart';
 import 'package:moviepy_flutter/moviepy_flutter.dart';
-import 'package:moviepy_flutter/video/cmd/color_cmd.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -65,7 +64,7 @@ class TextClip extends ImageClip {
       colorCMD(color: color, rate: rate, size: size),
       '-vf',
       getDrawtextCMD(file, File(output)),
-      if (duration != null) ...['-t', '${duration!.inSeconds}'],
+      if (super.duration != null) ...['-t', '${super.duration}'],
       output,
       '-y'
     ];

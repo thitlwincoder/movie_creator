@@ -6,7 +6,6 @@ class TextClipStyle {
     this.backgroundColor,
     this.color,
     this.fontSize,
-  
     this.alignment = Alignment.center,
   });
 

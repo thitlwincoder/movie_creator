@@ -130,12 +130,18 @@ class _TextOnVideoPageState extends State<TextOnVideoPage> {
 
     final video1Clip = VideoFileClip(
       media,
-      subclip: SubClip(duration: Duration(seconds: 5)),
-      layers: [TextClip('Video 1', style: TextClipStyle(fontSize: 40))],
+      trim: Trim(end: Duration(seconds: 5)),
+      layers: [
+        TextClip(
+          'Video 1',
+          style: TextClipStyle(fontSize: 40),
+        ),
+      ],
     );
+
     final video2Clip = VideoFileClip(
       media,
-      subclip: SubClip(duration: Duration(seconds: 5)),
+      trim: Trim(end: Duration(seconds: 5)),
       layers: [TextClip('Video 2', style: TextClipStyle(fontSize: 40))],
     );
 

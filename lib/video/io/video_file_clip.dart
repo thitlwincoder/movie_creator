@@ -7,7 +7,7 @@ class VideoFileClip extends VideoClip {
   VideoFileClip(
     this.media, {
     this.layers,
-    this.subclip,
+    this.trim,
   });
 
   String? frameRate;
@@ -25,7 +25,7 @@ class VideoFileClip extends VideoClip {
 
   final File media;
 
-  final SubClip? subclip;
+  final Trim? trim;
 
   final List<TextClip>? layers;
 
@@ -66,6 +66,8 @@ class VideoFileClip extends VideoClip {
   Future<void> writeVideoFile(File output) async {
     final file = await setFontDirectory();
 
+    if (super.duration == null) await init();
+
     final cmd = [
       '-i',
       media.path,
@@ -73,8 +75,8 @@ class VideoFileClip extends VideoClip {
         '-vf',
         '"${layers!.map((e) => e.getDrawtextCMD(file, output)).join(', ')}"',
       ],
-      if (subclip != null)
-        '-ss ${subclip!.start.inSeconds} -t ${subclip!.duration.inSeconds}',
+      if (trim != null && trim?.start != Duration.zero && trim?.end != null)
+        subclipCMD(start: trim!.start, end: trim!.end, fromStart: true),
       '-c:a',
       'copy',
       output.path,

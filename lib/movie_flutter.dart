@@ -1,6 +1,5 @@
 /// A Very Good Project created by Very Good CLI.
-library moviepy_flutter;
-
+library movie_flutter;
 
 export 'core/core.dart';
 export 'src/src.dart';

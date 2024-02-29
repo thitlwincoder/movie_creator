@@ -3,9 +3,28 @@ import 'dart:io';
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:moviepy_flutter/core/core.dart';
+import 'package:movie_flutter/core/core.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+
+Future<File> setFontDirectory() async {
+  final font = await rootBundle.load('assets/Baloo2-Medium.ttf');
+  final docDir = await getApplicationDocumentsDirectory();
+  final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
+  final file = File(path);
+
+  if (!file.existsSync()) {
+    await file.create();
+    await file.writeAsBytes(font.buffer.asUint8List(
+      font.offsetInBytes,
+      font.lengthInBytes,
+    ));
+  }
+
+  await FFmpegKitConfig.setFontDirectory(file.path);
+
+  return file;
+}
 
 abstract class Clip {
   Clip();
@@ -62,4 +81,29 @@ abstract class Clip {
   }
 
   Future<void> writeVideoFile(File output);
+
+  String getPositions(
+    Alignment align, [
+    EdgeInsets? padding,
+  ]) {
+    padding ??= EdgeInsets.zero;
+
+    final t = padding.top.toInt();
+    final b = padding.bottom.toInt();
+    final l = padding.left.toInt();
+    final r = padding.right.toInt();
+
+    if (align.x > 1 || align.y > 1) {
+      return 'x=${align.x}:y=${align.y}';
+    }
+
+    if (align == Alignment.topLeft) return 'x=$l:y=$t';
+    if (align == Alignment.topCenter) return 'x=(w-text_w)/2:y=$t';
+    if (align == Alignment.topRight) return 'x=w-tw-$r:y=$t';
+    if (align == Alignment.bottomLeft) return 'x=$l:y=h-th-$b';
+    if (align == Alignment.bottomCenter) return 'x=(w-text_w)/2:y=h-th-$b';
+    if (align == Alignment.bottomRight) return 'x=w-tw-$r:y=h-th-$b';
+
+    return 'x=(w-text_w)/2:y=(h-text_h)/2';
+  }
 }

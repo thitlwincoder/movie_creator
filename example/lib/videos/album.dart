@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart';
-import 'package:moviepy_flutter/video/video.dart';
-import 'package:open_file/open_file.dart';
+import 'package:movie_flutter/movie_flutter.dart';
+import 'package:movie_flutter/video/video.dart';
 import 'package:path/path.dart' as p;
 
 Future<void> album() async {
@@ -28,7 +27,7 @@ Future<void> album() async {
     duration: Duration(seconds: 3),
     transition: Transition('Shake', duration: Duration(seconds: 1)),
     layers: [
-      // ImageClip.fromList(
+      // MutliImageClip(
       //   paths: [img1, img2, img3, img4, img5],
       //   size: Size(width, 384),
       //   alignment: Alignment(width / 2, height / 2),
@@ -53,34 +52,47 @@ Future<void> album() async {
       ),
       ImageClip(
         path: logo2,
-        alignment: Alignment(width / 2, 60),
+        alignment: Alignment((width - 640) / 2, 60),
         scale: .6,
       ),
     ],
   );
 
-  // final scene2 = ColorClip(
-  //   color: Color(0xffb33771),
-  //   duration: Duration(seconds: 5),
-  //   layers: [
-  //     ImageClip(
-  //       path: bg,
-  //       alignment: Alignment(width / 2, height / 2),
-  //     ),
-  //     ImageClip(
-  //       path: logo1,
-  //       alignment: Alignment(width / 2, height / 2 - 150),
-  //       effect: Effect('fadeInDown', time: 1, delay: 1.2),
-  //     ),
-  //   ],
-  // );
+  final scene2 = ColorClip(
+    size: Size(width, height),
+    color: Color(0xffb33771),
+    duration: Duration(seconds: 5),
+    layers: [
+      TextClip(
+        'Text 1',
+        fontSize: 24,
+        color: Colors.white,
+        alignment: Alignment(width / 2, 250),
+        effect: Effect('fadeInUp', time: 1, delay: 2),
+      ),
+    ],
+    // layers: [
+    //   ImageClip(
+    //     path: bg,
+    //     alignment: Alignment(width / 2, height / 2),
+    //   ),
+    //   ImageClip(
+    //     path: logo1,
+    //     alignment: Alignment(width / 2, height / 2 - 150),
+    //     effect: Effect('fadeInDown', time: 1, delay: 1.2),
+    //   ),
+    // ],
+  );
 
-  // CompositeVideoClip([scene1, scene2]);
   final dir = await getDirectoryPath();
 
   final file = File(p.join(dir!, 'album.mp4'));
 
-  await scene1.writeVideoFile(file);
+  if (file.existsSync()) await file.delete();
 
-  await OpenFile.open(file.path);
+  final video = CompositeVideoClip([scene1, scene2]);
+
+  await video.writeVideoFile(file);
+
+  // await OpenFile.open(file.path);
 }

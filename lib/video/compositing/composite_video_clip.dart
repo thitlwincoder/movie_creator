@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:moviepy_flutter/moviepy_flutter.dart'
-    show Clip, Progress, VideoFileClip, ffmpeg;
+import 'package:movie_flutter/movie_flutter.dart' show Clip, ffmpeg;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -17,48 +16,32 @@ class CompositeVideoClip {
 
     final temp = await getTemporaryDirectory();
 
-    // await Future.forEach(clips, (clip) async {
-    //   var file = clip.media;
+    await Future.forEach(clips, (clip) async {
+      final file = File(p.join(temp.path, '${DateTime.now().millisecond}.mp4'));
+      await file.create();
 
-    //   final haveLayers = clip.layers?.isNotEmpty ?? false;
+      await clip.writeVideoFile(file);
 
-    //   if (haveLayers) {
-    //     file = File(p.join(temp.path, '${DateTime.now().millisecond}.webm'));
-    //     await file.create();
+      contents.writeln("file '${file.path}'");
+    });
 
-    //     await clip.writeVideoFile(file);
-    //   }
+    final tempTxt =
+        File(p.join(temp.path, '${DateTime.now().millisecond}.txt'));
+    await tempTxt.writeAsString(contents.toString());
 
-    //   contents.writeln("file '${file.path}'");
+    await ffmpeg.execute([
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      tempTxt.path,
+      '-c',
+      'copy',
+      output.path,
+      '-y'
+    ]);
 
-    //   if (haveLayers) return;
-
-    //   final trim = clip.trim;
-
-    //   if (trim == null) return;
-
-    //   contents.writeln('inpoint ${trim.start.inSeconds}');
-
-    //   if (trim.end != null) contents.writeln('outpoint ${trim.end?.inSeconds}');
-    // });
-
-    // final tempTxt =
-    //     File(p.join(temp.path, '${DateTime.now().millisecond}.txt'));
-    // await tempTxt.writeAsString(contents.toString());
-
-    // await ffmpeg.execute([
-    //   '-f',
-    //   'concat',
-    //   '-safe',
-    //   '0',
-    //   '-i',
-    //   tempTxt.path,
-    //   '-c',
-    //   'copy',
-    //   output.path,
-    //   '-y'
-    // ]);
-
-    // await tempTxt.delete();
+    await tempTxt.delete();
   }
 }

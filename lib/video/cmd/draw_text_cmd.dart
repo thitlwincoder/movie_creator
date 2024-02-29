@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 
 String drawtextCMD(
   String text, {
@@ -12,7 +12,7 @@ String drawtextCMD(
   int? start,
   int? end,
   int? rotate,
-  String? prefix,
+  String? alpha,
 }) {
   var cmd = <String>[
     "text='$text'",
@@ -34,7 +34,7 @@ String drawtextCMD(
 
   cmd = cmd.toSet().toList();
 
-  return 'drawtext=${cmd.join(':')}${prefix == null ? '' : '[$prefix]'}';
+  return 'drawtext=${cmd.join(':')}';
 }
 
 String _getPositions(EdgeInsets padding, Alignment align) {

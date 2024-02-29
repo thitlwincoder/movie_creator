@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 
 class VideoFileClip extends VideoClip {
   VideoFileClip(

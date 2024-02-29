@@ -6,7 +6,7 @@ import 'package:async/async.dart';
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
 import 'package:flutter/services.dart';
-import 'package:moviepy_flutter/core/core.dart';
+import 'package:movie_flutter/core/core.dart';
 
 class _Engine {
   _Engine(this._execs);

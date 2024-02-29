@@ -1,7 +1,9 @@
-import 'package:flutter/widgets.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart' show Transition;
+import 'dart:io';
 
-class MutliImageClip {
+import 'package:flutter/widgets.dart';
+import 'package:movie_flutter/movie_flutter.dart' show Clip, Transition;
+
+class MutliImageClip extends Clip {
   MutliImageClip({
     required Size size,
     required Alignment alignment,
@@ -9,4 +11,10 @@ class MutliImageClip {
     required Duration duration,
     required List<String> paths,
   });
+
+  @override
+  Future<void> writeVideoFile(File output) {
+    // TODO: implement writeVideoFile
+    throw UnimplementedError();
+  }
 }

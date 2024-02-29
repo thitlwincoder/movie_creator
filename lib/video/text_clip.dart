@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' show Alignment, Colors, EdgeInsets;
 import 'package:flutter/services.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 

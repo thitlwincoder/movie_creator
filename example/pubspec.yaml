@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  moviepy_flutter:
+  movie_flutter:
     path: ../
   flutter_hooks: ^0.20.5
   go_router: ^13.2.0

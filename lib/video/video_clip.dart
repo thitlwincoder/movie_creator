@@ -1,4 +1,4 @@
-import 'package:moviepy_flutter/moviepy_flutter.dart' show Clip;
+import 'package:movie_flutter/movie_flutter.dart' show Clip;
 
 abstract class VideoClip extends Clip {
   VideoClip();

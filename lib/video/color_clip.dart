@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:moviepy_flutter/moviepy_flutter.dart'
+import 'package:movie_flutter/movie_flutter.dart'
     show
         Clip,
         ColorExt,
@@ -12,7 +12,7 @@ import 'package:moviepy_flutter/moviepy_flutter.dart'
         cmdPrint,
         drawtextCMD,
         ffmpeg;
-import 'package:moviepy_flutter/video/utils/transition.dart';
+import 'package:movie_flutter/video/utils/transition.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -39,64 +39,9 @@ class ColorClip extends Clip {
 
     final sizeFormat = '${size.width.toInt()}x${size.height.toInt()}';
 
-    final filters = <String>[];
+    final tmpPaths = [await getTemp('bg.mp4')];
 
-    final images = <String>[];
-    final texts = <String>[];
-    final prefixs = <String>[];
-
-    final temp = await getTemporaryDirectory();
-
-    for (final e in layers) {
-      if (e is TextClip) {
-        final prefix = e.text.toLowerCase().replaceAll(' ', '_');
-
-        var cmd = drawtextCMD(
-          e.text,
-          fontcolor: e.color ?? Colors.black,
-          fontsize: e.fontSize ?? 20,
-          alignment: e.alignment,
-          padding: e.padding,
-          bgcolor: e.backgroundColor,
-          fontfile: fontfile.path,
-        );
-        cmd = '$cmd[$prefix]';
-
-        if (prefixs.isEmpty) {
-          cmd = '${'[0:v]'}$cmd';
-        } else {
-          cmd = '[${prefixs.last}]$cmd';
-        }
-
-        texts.add(cmd);
-        filters.add('$cmd,');
-
-        prefixs.add(prefix);
-      }
-
-      if (e is ImageClip) {
-        final bytes = await rootBundle.load(e.path);
-        final byteList =
-            bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-
-        final file = File(p.join(temp.path, p.basename(e.path)));
-        await file.create();
-        await file.writeAsBytes(byteList);
-
-        images.add(file.path);
-
-        // filters.add("movie='${file.path}'[logo];");
-        // inputSourceCount++;
-      }
-    }
-
-    // for (var i = 1; i <= inputSourceCount; i++) {
-    //   input.write('[$i:v]');
-    // }
-
-    // filters.add('${input}overlay=(W-w)/2:60 [out]');
-
-    final cmd = [
+    await ffmpeg.execute([
       '-f',
       'lavfi',
       '-i',
@@ -104,13 +49,105 @@ class ColorClip extends Clip {
           'c=${color.toHex}:'
           's=$sizeFormat:'
           'd=${duration!.inSeconds}',
-      for (final e in images) '-i $e',
-      '-filter_complex',
-      '"${texts.map((e) => '$e;').join(' ')} ${'[${prefixs.last}]'}[1:v]overlay=(W-w)/2:(H-h)/2"',
-      output.path,
+      tmpPaths.last,
       '-y'
-    ];
+    ]);
 
-    await ffmpeg.execute(cmd);
+    final textClips = layers.whereType<TextClip>().toList();
+
+    layers.removeWhere((e) => e is TextClip);
+    final otherClips = layers;
+
+    var i = 1;
+
+    final tmpName = await getTemp('tmp$i.mp4');
+
+    await Future.forEach(otherClips, (clip) async {
+      if (clip is ImageClip) {
+        final path = await moveAssetToTemp(clip.path);
+
+        final ps = clip.getPositions(clip.alignment, clip.padding);
+
+        await ffmpeg.execute([
+          '-i',
+          tmpPaths.last,
+          '-i',
+          path,
+          '-filter_complex',
+          '[0:v][1:v]overlay=$ps',
+          '-c:a',
+          'copy',
+          tmpName,
+          '-y'
+        ]);
+
+        tmpPaths.add(tmpName);
+      }
+
+      i++;
+    });
+
+    if (textClips.length > 1) {
+      await ffmpeg.execute([
+        '-i',
+        tmpPaths.last,
+        '-filter_complex',
+        '"${[
+          for (final e in textClips)
+            drawtextCMD(
+              e.text,
+              alignment: e.alignment,
+              bgcolor: e.backgroundColor,
+              padding: e.padding,
+              fontcolor: e.color ?? Colors.black,
+              fontsize: e.fontSize ?? 20,
+              fontfile: fontfile.path,
+            )
+        ].join(', ')}"',
+        '-c:a',
+        'copy',
+        output.path,
+        '-y'
+      ]);
+    } else {
+      final e = textClips.first;
+
+      await ffmpeg.execute([
+        '-i',
+        tmpPaths.last,
+        '-vf',
+        drawtextCMD(
+          e.text,
+          alignment: e.alignment,
+          bgcolor: e.backgroundColor,
+          padding: e.padding,
+          fontcolor: e.color ?? Colors.black,
+          fontsize: e.fontSize ?? 20,
+          fontfile: fontfile.path,
+        ),
+        '-c:a',
+        'copy',
+        output.path,
+        '-y'
+      ]);
+    }
   }
+}
+
+Future<String> getTemp(String name) async {
+  final dir = await getTemporaryDirectory();
+
+  final temp = p.join(dir.path, name);
+
+  await File(temp).create();
+  return temp;
+}
+
+Future<String> moveAssetToTemp(String path) async {
+  final tmp = await getTemp(p.basename(path));
+
+  final bytes = await rootBundle.load(path);
+  await File(tmp).writeAsBytes(bytes.buffer.asUint8List());
+
+  return tmp;
 }

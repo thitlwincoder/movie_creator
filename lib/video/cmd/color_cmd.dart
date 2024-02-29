@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:moviepy_flutter/moviepy_flutter.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 
 String colorCMD({
   Color? color,

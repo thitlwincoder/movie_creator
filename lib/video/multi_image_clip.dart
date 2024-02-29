@@ -5,12 +5,18 @@ import 'package:movie_flutter/movie_flutter.dart' show Clip, Transition;
 
 class MutliImageClip extends Clip {
   MutliImageClip({
-    required Size size,
-    required Alignment alignment,
+    required this.size,
+    required this.alignment,
     required Transition transition,
     required Duration duration,
-    required List<String> paths,
-  });
+    required this.paths,
+  }) {
+    super.duration = duration;
+  }
+
+  final List<String> paths;
+  final Size size;
+  final Alignment alignment;
 
   @override
   Future<void> writeVideoFile(File output) {

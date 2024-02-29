@@ -27,19 +27,19 @@ Future<void> album() async {
     duration: Duration(seconds: 3),
     transition: Transition('Shake', duration: Duration(seconds: 1)),
     layers: [
-      // MutliImageClip(
-      //   paths: [img1, img2, img3, img4, img5],
-      //   size: Size(width, 384),
-      //   alignment: Alignment(width / 2, height / 2),
-      //   transition: Transition('zoomIn'),
-      //   duration: Duration(seconds: 2),
-      // ),
+      MutliImageClip(
+        paths: [img1, img2, img3, img4, img5],
+        size: Size(width, height),
+        alignment: Alignment(width / 2, height / 2),
+        transition: Transition('zoomIn'),
+        duration: Duration(seconds: 2),
+      ),
       TextClip(
         'DEMO',
         fontSize: 40,
         color: Color(0xffffffff),
-        backgroundColor: Color(0xff01003c),
         padding: EdgeInsets.all(10),
+        backgroundColor: Color(0xff01003c),
         alignment: Alignment(width / 2, 150),
         effect: Effect('fadeInUp', time: 1, delay: 1),
       ),
@@ -52,7 +52,7 @@ Future<void> album() async {
       ),
       ImageClip(
         path: logo2,
-        alignment: Alignment((width - 640) / 2, 60),
+        alignment: Alignment(width / 2, 60),
         scale: .6,
       ),
     ],
@@ -63,25 +63,16 @@ Future<void> album() async {
     color: Color(0xffb33771),
     duration: Duration(seconds: 5),
     layers: [
-      TextClip(
-        'Text 1',
-        fontSize: 24,
-        color: Colors.white,
-        alignment: Alignment(width / 2, 250),
-        effect: Effect('fadeInUp', time: 1, delay: 2),
+      ImageClip(
+        path: bg,
+        alignment: Alignment(width / 2, height / 2),
+      ),
+      ImageClip(
+        path: logo1,
+        alignment: Alignment(width / 2, height / 2 ),
+        effect: Effect('fadeInDown', time: 1, delay: 1),
       ),
     ],
-    // layers: [
-    //   ImageClip(
-    //     path: bg,
-    //     alignment: Alignment(width / 2, height / 2),
-    //   ),
-    //   ImageClip(
-    //     path: logo1,
-    //     alignment: Alignment(width / 2, height / 2 - 150),
-    //     effect: Effect('fadeInDown', time: 1, delay: 1.2),
-    //   ),
-    // ],
   );
 
   final dir = await getDirectoryPath();

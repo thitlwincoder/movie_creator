@@ -12,29 +12,38 @@ String drawtextCMD(
   int? start,
   int? end,
   int? rotate,
-  String? alpha,
+  Effect? effect,
 }) {
-  var cmd = <String>[
-    "text='$text'",
-    'fontcolor=${fontcolor.toHex}',
-    'fontsize=$fontsize',
-    _getPositions(padding, alignment),
-    "fontfile='$fontfile'",
-  ];
+  if (effect != null) {
+    start ??= effect.delay;
+    end ??= effect.delay + effect.time;
+  }
+
+  final buffer = StringBuffer(
+    "drawtext=text='$text':fontsize=$fontsize:fontfile='$fontfile':",
+  );
+
+  if (effect == null) {
+    buffer.write('${_getPositions(padding, alignment)}:');
+  } else {
+    final (x, y) = _getXY(padding, alignment);
+    buffer.write('x=$x:y=$y-(t*20)-20:');
+  }
 
   if (bgcolor != null) {
-    cmd.addAll(['box=1', 'boxcolor=${bgcolor.toHex}']);
+    buffer.write('box=1:boxcolor=${bgcolor.toHex}:');
   }
 
   if (start != null && end != null) {
-    cmd.add("enable='between(t,$start,$end)'");
+    buffer.write("enable='between(t,$start,$end)':");
   }
 
-  if (rotate != null) cmd.add('rotate=$rotate');
+  if (effect != null) {
+    buffer.write(
+        "alpha='if(lte(t,${effect.delay}),0,if(lte(t,${effect.delay + effect.time}),(t-${effect.delay})/1,1))'");
+  }
 
-  cmd = cmd.toSet().toList();
-
-  return 'drawtext=${cmd.join(':')}';
+  return buffer.toString();
 }
 
 String _getPositions(EdgeInsets padding, Alignment align) {
@@ -55,4 +64,19 @@ String _getPositions(EdgeInsets padding, Alignment align) {
   if (align == Alignment.bottomRight) return 'x=w-tw-$r:y=h-th-$b';
 
   return 'x=(w-text_w)/2:y=(h-text_h)/2';
+}
+
+(double x, double double) _getXY(EdgeInsets padding, Alignment align) {
+  final p = _getPositions(padding, align);
+
+  final s = p.split(':');
+
+  double parse(String str) {
+    return double.parse(str.split('=').last);
+  }
+
+  final x = parse(s.first);
+  final y = parse(s.last);
+
+  return (x, y);
 }

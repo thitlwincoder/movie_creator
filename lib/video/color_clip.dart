@@ -8,8 +8,10 @@ import 'package:movie_flutter/movie_flutter.dart'
         ColorExt,
         FFMpegCommand,
         ImageClip,
+        MutliImageClip,
         TextClip,
         cmdPrint,
+        colorCMD,
         drawtextCMD,
         ffmpeg;
 import 'package:movie_flutter/video/utils/transition.dart';
@@ -45,10 +47,7 @@ class ColorClip extends Clip {
       '-f',
       'lavfi',
       '-i',
-      'color='
-          'c=${color.toHex}:'
-          's=$sizeFormat:'
-          'd=${duration!.inSeconds}',
+      colorCMD(color: color, size: size, duration: duration),
       tmpPaths.last,
       '-y'
     ]);
@@ -60,9 +59,16 @@ class ColorClip extends Clip {
 
     var i = 1;
 
-    final tmpName = await getTemp('tmp$i.mp4');
+    var tmpName = await getTemp('tmp$i.mp4');
 
     await Future.forEach(otherClips, (clip) async {
+      if (clip is MutliImageClip) {
+        await overlayMultiImageOnVideo(tmpPaths.last, clip, tmpName);
+        tmpPaths.add(tmpName);
+        i += 1;
+        tmpName = await getTemp('tmp$i.mp4');
+      }
+
       if (clip is ImageClip) {
         final path = await moveAssetToTemp(clip.path);
 
@@ -82,33 +88,22 @@ class ColorClip extends Clip {
         ]);
 
         tmpPaths.add(tmpName);
-      }
 
-      i++;
+        i += 1;
+        tmpName = await getTemp('tmp$i.mp4');
+      }
     });
 
+    if (textClips.isEmpty) {
+      await ffmpeg
+          .execute(['-i', tmpPaths.last, '-c:a', 'copy', output.path, '-y']);
+      return;
+    }
+
     if (textClips.length > 1) {
-      await ffmpeg.execute([
-        '-i',
-        tmpPaths.last,
-        '-filter_complex',
-        '"${[
-          for (final e in textClips)
-            drawtextCMD(
-              e.text,
-              alignment: e.alignment,
-              bgcolor: e.backgroundColor,
-              padding: e.padding,
-              fontcolor: e.color ?? Colors.black,
-              fontsize: e.fontSize ?? 20,
-              fontfile: fontfile.path,
-            )
-        ].join(', ')}"',
-        '-c:a',
-        'copy',
-        output.path,
-        '-y'
-      ]);
+      await ffmpeg.execute(
+        overlayMultiTextOnVideo(tmpPaths.last, textClips, fontfile, output),
+      );
     } else {
       final e = textClips.first;
 
@@ -134,6 +129,87 @@ class ColorClip extends Clip {
   }
 }
 
+Future<void> overlayMultiImageOnVideo(
+  String input,
+  MutliImageClip clip,
+  String output,
+) async {
+  var i = 0;
+
+  final paths = <String>[];
+  var ext = '';
+
+  await Future.forEach(clip.paths, (path) async {
+    ext = p.extension(path);
+
+    paths.add(await moveAssetToTemp(path, name: 'img$i$ext'));
+    i++;
+  });
+
+  final sizeFormat = '${clip.size.width.toInt()}x${clip.size.height.toInt()}';
+
+  final tmp = await getTemp('multi_img.mp4');
+
+  await ffmpeg.execute([
+    '-framerate',
+    '1/2',
+    '-t',
+    '${clip.duration?.inSeconds ?? 5}',
+    '-i',
+    p.join(p.dirname(paths.first), 'img%d$ext'),
+    '-vf',
+    '"scale=$sizeFormat"',
+    // '-r',
+    // '4',
+    // '-pix_fmt',
+    // 'yuv420p',
+    tmp,
+    '-y'
+  ]);
+
+  await ffmpeg.execute([
+    '-i',
+    input,
+    '-i',
+    tmp,
+    '-filter_complex',
+    '"[0:v][1:v] overlay=(W-w)/2:(H-h)/2"',
+    output,
+    '-y'
+  ]);
+}
+
+List<String> overlayMultiTextOnVideo(
+  String input,
+  List<TextClip> clips,
+  File fontfile,
+  File output,
+) {
+  final cmd = ['-i', '"$input"', '-filter_complex'];
+
+  final txts = <String>[];
+
+  for (final e in clips) {
+    txts.add(drawtextCMD(
+      e.text,
+      padding: e.padding,
+      alignment: e.alignment,
+      fontcolor: e.color ?? Colors.black,
+      fontsize: e.fontSize ?? 20,
+      fontfile: fontfile.path,
+      effect: e.effect,
+      start: e.start,
+      end: e.end,
+    ));
+  }
+
+  cmd
+    ..add('"${txts.join(',')}"')
+    ..addAll(['-c:a', 'copy', output.path, '-y']);
+
+  return cmd;
+}
+
 Future<String> getTemp(String name) async {
   final dir = await getTemporaryDirectory();
 
@@ -143,10 +219,10 @@ Future<String> getTemp(String name) async {
   return temp;
 }
 
-Future<String> moveAssetToTemp(String path) async {
-  final tmp = await getTemp(p.basename(path));
-
+Future<String> moveAssetToTemp(String path, {String? name}) async {
   final bytes = await rootBundle.load(path);
+
+  final tmp = await getTemp(name ?? p.basename(path));
   await File(tmp).writeAsBytes(bytes.buffer.asUint8List());
 
   return tmp;

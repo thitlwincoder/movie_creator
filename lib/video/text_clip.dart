@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 class TextClip extends Clip {
   TextClip(
     this.text, {
-    Effect? effect,
+    this.effect,
     Duration? duration,
     this.rate = 30,
     this.size,
@@ -32,21 +32,22 @@ class TextClip extends Clip {
   final int? rotate;
   final Alignment alignment;
 
-  final Duration? start;
-  final Duration? end;
+  final int? start;
+  final int? end;
 
   final Color? color;
   final Color? backgroundColor;
   final int? fontSize;
+  final Effect? effect;
 
   String getDrawtextCMD(File fontfile, File output) {
     return drawtextCMD(
       text,
+      end: end,
+      start: start,
       rotate: rotate,
       padding: padding,
-      end: end?.inSeconds,
       alignment: alignment,
-      start: start?.inSeconds,
       fontfile: fontfile.path,
       fontsize: fontSize ?? 24,
       bgcolor: backgroundColor,

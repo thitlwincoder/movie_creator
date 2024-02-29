@@ -1,7 +1,7 @@
 class Effect {
-  Effect(this.type, {this.time, this.delay});
+  Effect(this.type, {required this.time, required this.delay});
 
   final String type;
-  final double? time;
-  final double? delay;
+  final int time;
+  final int delay;
 }

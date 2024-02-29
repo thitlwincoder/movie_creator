@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_full/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_full/return_code.dart';
 import 'package:flutter/services.dart';
-import 'package:movie_flutter/core/core.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 
 class _Engine {
   _Engine(this._execs);
@@ -49,11 +49,21 @@ class _Engine {
   }
 
   Future<String> execute(List<String> commands) async {
+    final enableLog = MovieFlutterConfig().enableLog;
+
     if (Platform.isAndroid || Platform.isIOS) {
       switch (_execs) {
         case Execs.ffmpeg:
           final session = await FFmpegKit.execute(commands.join(' '));
-          log((await session.getAllLogsAsString()) ?? '');
+          if (enableLog) {
+            logger.i(session.getCommand() ?? '');
+          }
+
+          final code = await session.getReturnCode();
+
+          if (!ReturnCode.isSuccess(code)) {
+            logger.e((await session.getAllLogsAsString()) ?? '');
+          }
           return (await session.getOutput())!;
         case Execs.ffprobe:
           final session = await FFprobeKit.execute(commands.join(' '));

@@ -1,4 +1,4 @@
-import 'package:example/src/home/widgets/menu_item.dart';
+import 'package:example/videos/album.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -29,8 +29,12 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: const [
-          MenuItem(title: 'Text To Video', location: 'text_to_video'),
-          MenuItem(title: 'Text On Video', location: 'text_on_video'),
+          ListTile(
+            title: Text('Album'),
+            onTap: album,
+          ),
+          // MenuItem(title: 'Text To Video', location: 'text_to_video'),
+          // MenuItem(title: 'Text On Video', location: 'text_on_video'),
         ],
       ),
     );

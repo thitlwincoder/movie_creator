@@ -31,9 +31,10 @@ flutter:
   assets:
     - assets/big_buck_bunny_0_30.webm
     - assets/Baloo2-Medium.ttf
-    - assets/audio/*
-    - assets/data/*
-    - assets/font/*
-    - assets/imgs/*
-    - assets/lottie/*
-    - assets/video/*
+    - assets/audio/
+    - assets/data/
+    - assets/font/
+    - assets/imgs/
+    - assets/imgs/logo/
+    - assets/lottie/
+    - assets/video/

@@ -53,7 +53,7 @@ class _Engine {
       switch (_execs) {
         case Execs.ffmpeg:
           final session = await FFmpegKit.execute(commands.join(' '));
-          // log((await session.getAllLogsAsString()) ?? '');
+          log((await session.getAllLogsAsString()) ?? '');
           return (await session.getOutput())!;
         case Execs.ffprobe:
           final session = await FFprobeKit.execute(commands.join(' '));

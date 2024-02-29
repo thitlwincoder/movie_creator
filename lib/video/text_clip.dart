@@ -6,47 +6,51 @@ import 'package:moviepy_flutter/moviepy_flutter.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class TextClip extends ImageClip {
+class TextClip extends Clip {
   TextClip(
     this.text, {
+    Effect? effect,
     Duration? duration,
-    this.style,
     this.rate = 30,
     this.size,
     this.start,
     this.end,
     this.rotate,
+    this.color,
+    this.fontSize,
+    this.backgroundColor,
+    this.alignment = Alignment.center,
     this.padding = EdgeInsets.zero,
-    this.color = Colors.transparent,
   }) {
-    style ??= TextClipStyle();
     super.duration = duration;
   }
 
   final String text;
   final Size? size;
   final int rate;
-  final Color color;
-  TextClipStyle? style;
   final EdgeInsets padding;
   final int? rotate;
+  final Alignment alignment;
 
   final Duration? start;
   final Duration? end;
 
-  String getDrawtextCMD(File fontfile, File output) {
-    final position = _getPositions();
+  final Color? color;
+  final Color? backgroundColor;
+  final int? fontSize;
 
+  String getDrawtextCMD(File fontfile, File output) {
     return drawtextCMD(
       text,
       rotate: rotate,
-      position: position,
-      fontfile: fontfile.path,
+      padding: padding,
       end: end?.inSeconds,
+      alignment: alignment,
       start: start?.inSeconds,
-      fontsize: style?.fontSize ?? 24,
-      bgcolor: style?.backgroundColor,
-      fontcolor: style?.color ?? Colors.white,
+      fontfile: fontfile.path,
+      fontsize: fontSize ?? 24,
+      bgcolor: backgroundColor,
+      fontcolor: color ?? Colors.white,
     );
   }
 
@@ -60,8 +64,8 @@ class TextClip extends ImageClip {
     final cmd = [
       '-f',
       'lavfi',
-      '-i',
-      colorCMD(color: color, rate: rate, size: size),
+      // '-i',
+      // colorCMD(color: color, rate: rate, size: size),
       '-vf',
       getDrawtextCMD(file, File(output)),
       if (super.duration != null) ...['-t', '${super.duration}'],
@@ -79,23 +83,5 @@ class TextClip extends ImageClip {
     final temp = await save();
     await File(temp).copy(output.path);
     await File(temp).delete();
-  }
-
-  String _getPositions() {
-    final t = padding.top.toInt();
-    final b = padding.bottom.toInt();
-    final l = padding.left.toInt();
-    final r = padding.right.toInt();
-
-    final align = style?.alignment;
-
-    if (align == Alignment.topLeft) return 'x=$l:y=$t';
-    if (align == Alignment.topCenter) return 'x=(w-text_w)/2:y=$t';
-    if (align == Alignment.topRight) return 'x=w-tw-$r:y=$t';
-    if (align == Alignment.bottomLeft) return 'x=$l:y=h-th-$b';
-    if (align == Alignment.bottomCenter) return 'x=(w-text_w)/2:y=h-th-$b';
-    if (align == Alignment.bottomRight) return 'x=w-tw-$r:y=h-th-$b';
-
-    return 'x=(w-text_w)/2:y=(h-text_h)/2';
   }
 }

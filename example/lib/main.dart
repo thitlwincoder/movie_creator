@@ -2,14 +2,12 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:example/src/home/home_page.dart';
-import 'package:example/src/text_on_video/text_on_video_page.dart';
-import 'package:example/src/text_to_video/text_to_video_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
 }
 
@@ -32,16 +30,16 @@ GoRouter router = GoRouter(
     GoRoute(
       path: '/',
       builder: (_, __) => HomePage(),
-      routes: [
-        GoRoute(
-          path: 'text_to_video',
-          builder: (_, __) => TextToVideoPage(),
-        ),
-        GoRoute(
-          path: 'text_on_video',
-          builder: (_, __) => TextOnVideoPage(),
-        ),
-      ],
+      // routes: [
+      //   GoRoute(
+      //     path: 'text_to_video',
+      //     builder: (_, __) => TextToVideoPage(),
+      //   ),
+      //   GoRoute(
+      //     path: 'text_on_video',
+      //     builder: (_, __) => TextOnVideoPage(),
+      //   ),
+      // ],
     ),
   ],
 );

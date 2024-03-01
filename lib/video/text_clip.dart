@@ -12,7 +12,7 @@ class TextClip extends Clip {
     this.effect,
     Duration? duration,
     this.rate = 30,
-    this.size,
+    Size? size,
     this.start,
     this.end,
     this.rotate,
@@ -22,11 +22,11 @@ class TextClip extends Clip {
     this.alignment = Alignment.center,
     this.padding = EdgeInsets.zero,
   }) {
-    super.duration = duration;
+    if (duration != null) super.duration = duration;
+    if (size != null) super.size = size;
   }
 
   final String text;
-  final Size? size;
   final int rate;
   final EdgeInsets padding;
   final int? rotate;
@@ -40,7 +40,7 @@ class TextClip extends Clip {
   final int? fontSize;
   final Effect? effect;
 
-  String getDrawtextCMD(File fontfile, File output) {
+  String getDrawtextCMD(File output) {
     return drawtextCMD(
       text,
       end: end,
@@ -48,7 +48,6 @@ class TextClip extends Clip {
       rotate: rotate,
       padding: padding,
       alignment: alignment,
-      fontfile: fontfile.path,
       fontsize: fontSize ?? 24,
       bgcolor: backgroundColor,
       fontcolor: color ?? Colors.white,
@@ -57,7 +56,7 @@ class TextClip extends Clip {
 
   @override
   Future<String> save() async {
-    final file = await setFontDirectory();
+    await setFontDirectory();
 
     final temp = await getTemporaryDirectory();
     final output = p.join(temp.path, '${DateTime.now().millisecond}.mp4');
@@ -65,11 +64,9 @@ class TextClip extends Clip {
     final cmd = [
       '-f',
       'lavfi',
-      // '-i',
-      // colorCMD(color: color, rate: rate, size: size),
       '-vf',
-      getDrawtextCMD(file, File(output)),
-      if (super.duration != null) ...['-t', '${super.duration}'],
+      getDrawtextCMD(File(output)),
+      ...['-t', '${super.duration}'],
       output,
       '-y'
     ];

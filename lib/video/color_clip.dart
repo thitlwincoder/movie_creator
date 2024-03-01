@@ -5,12 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:movie_flutter/movie_flutter.dart'
     show
         Clip,
-        ColorExt,
-        FFMpegCommand,
         ImageClip,
-        MutliImageClip,
+        MultiImageClip,
         TextClip,
-        cmdPrint,
         colorCMD,
         drawtextCMD,
         ffmpeg;
@@ -24,30 +21,30 @@ class ColorClip extends Clip {
     required Duration duration,
     Transition? transition,
     this.rate = 30,
-    this.size = const Size(320, 240),
+    Size? size,
     this.layers = const [],
   }) {
     super.duration = duration;
+    if (size != null) super.size = size;
   }
 
   final Color color;
-  final Size size;
   final int rate;
   final List<Clip> layers;
 
   @override
   Future<void> writeVideoFile(File output) async {
-    final fontfile = await setFontDirectory();
+    await setFontDirectory();
 
-    final sizeFormat = '${size.width.toInt()}x${size.height.toInt()}';
+    final ext = p.extension(output.path);
 
-    final tmpPaths = [await getTemp('bg.mp4')];
+    final tmpPaths = [await getTemp('${prefix}bg$ext')];
 
     await ffmpeg.execute([
       '-f',
       'lavfi',
       '-i',
-      colorCMD(color: color, size: size, duration: duration),
+      colorCMD(color: color, size: super.size, duration: duration),
       tmpPaths.last,
       '-y'
     ]);
@@ -59,20 +56,27 @@ class ColorClip extends Clip {
 
     var i = 1;
 
-    var tmpName = await getTemp('tmp$i.mp4');
+    var tmpName = await getTemp('${prefix}tmp$i$ext');
 
     await Future.forEach(otherClips, (clip) async {
-      if (clip is MutliImageClip) {
-        await overlayMultiImageOnVideo(tmpPaths.last, clip, tmpName);
+      if (clip is MultiImageClip) {
+        await overlayMultiImageOnVideo(
+          tmpPaths.last,
+          clip,
+          tmpName,
+          ext,
+          prefix,
+        );
         tmpPaths.add(tmpName);
         i += 1;
-        tmpName = await getTemp('tmp$i.mp4');
+        tmpName = await getTemp('${prefix}tmp$i$ext');
       }
 
       if (clip is ImageClip) {
         final path = await moveAssetToTemp(clip.path);
 
-        final ps = clip.getPositions(clip.alignment, clip.padding);
+        final ps =
+            clip.getPositions(clip.alignment, clip.padding, clip.transition);
 
         await ffmpeg.execute([
           '-i',
@@ -80,7 +84,7 @@ class ColorClip extends Clip {
           '-i',
           path,
           '-filter_complex',
-          '[0:v][1:v]overlay=$ps',
+          '[0:v][1:v]overlay="$ps"',
           '-c:a',
           'copy',
           tmpName,
@@ -90,7 +94,7 @@ class ColorClip extends Clip {
         tmpPaths.add(tmpName);
 
         i += 1;
-        tmpName = await getTemp('tmp$i.mp4');
+        tmpName = await getTemp('${prefix}tmp$i$ext');
       }
     });
 
@@ -102,7 +106,7 @@ class ColorClip extends Clip {
 
     if (textClips.length > 1) {
       await ffmpeg.execute(
-        overlayMultiTextOnVideo(tmpPaths.last, textClips, fontfile, output),
+        overlayMultiTextOnVideo(tmpPaths.last, textClips, output),
       );
     } else {
       final e = textClips.first;
@@ -118,7 +122,6 @@ class ColorClip extends Clip {
           padding: e.padding,
           fontcolor: e.color ?? Colors.black,
           fontsize: e.fontSize ?? 20,
-          fontfile: fontfile.path,
         ),
         '-c:a',
         'copy',
@@ -131,38 +134,36 @@ class ColorClip extends Clip {
 
 Future<void> overlayMultiImageOnVideo(
   String input,
-  MutliImageClip clip,
+  MultiImageClip clip,
   String output,
+  String ext,
+  String prefix,
 ) async {
   var i = 0;
 
   final paths = <String>[];
-  var ext = '';
+
+  var imgExt = '';
 
   await Future.forEach(clip.paths, (path) async {
-    ext = p.extension(path);
-
-    paths.add(await moveAssetToTemp(path, name: 'img$i$ext'));
+    imgExt = p.extension(path);
+    paths.add(await moveAssetToTemp(path, name: '${prefix}img$i$imgExt'));
     i++;
   });
 
   final sizeFormat = '${clip.size.width.toInt()}x${clip.size.height.toInt()}';
 
-  final tmp = await getTemp('multi_img.mp4');
+  final tmp = await getTemp('${prefix}multi_img$ext');
 
   await ffmpeg.execute([
     '-framerate',
-    '1/2',
+    '1',
     '-t',
-    '${clip.duration?.inSeconds ?? 5}',
+    '${clip.duration.inSeconds}',
     '-i',
-    p.join(p.dirname(paths.first), 'img%d$ext'),
-    '-vf',
-    '"scale=$sizeFormat"',
-    // '-r',
-    // '4',
-    // '-pix_fmt',
-    // 'yuv420p',
+    p.join(p.dirname(paths.first), 'img%d$imgExt'),
+    // '-vf',
+    // '"${clip.transition},fps=25,scale=$sizeFormat"',
     tmp,
     '-y'
   ]);
@@ -182,7 +183,6 @@ Future<void> overlayMultiImageOnVideo(
 List<String> overlayMultiTextOnVideo(
   String input,
   List<TextClip> clips,
-  File fontfile,
   File output,
 ) {
   final cmd = ['-i', '"$input"', '-filter_complex'];
@@ -196,7 +196,6 @@ List<String> overlayMultiTextOnVideo(
       alignment: e.alignment,
       fontcolor: e.color ?? Colors.black,
       fontsize: e.fontSize ?? 20,
-      fontfile: fontfile.path,
       effect: e.effect,
       start: e.start,
       end: e.end,

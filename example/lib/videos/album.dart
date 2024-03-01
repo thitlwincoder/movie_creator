@@ -22,17 +22,16 @@ Future<void> album() async {
   const height = 1024.0;
 
   final scene1 = ColorClip(
-    size: Size(width, height),
     color: Color(0xff3b3a98),
-    duration: Duration(seconds: 3),
-    transition: Transition('Shake', duration: Duration(seconds: 1)),
+    duration: Duration(seconds: 4),
+    // transition: Transition(),
     layers: [
-      MutliImageClip(
-        paths: [img1, img2, img3, img4, img5],
-        size: Size(width, height),
-        alignment: Alignment(width / 2, height / 2),
-        transition: Transition('zoomIn'),
+      MultiImageClip(
+        size: Size(width, 384),
+        // transition: Transition.zoomIn,
         duration: Duration(seconds: 2),
+        paths: [img1, img2, img3, img4, img5],
+        alignment: Alignment(width / 2, height / 2),
       ),
       TextClip(
         'DEMO',
@@ -51,25 +50,25 @@ Future<void> album() async {
         effect: Effect('fadeInUp', time: 1, delay: 2),
       ),
       ImageClip(
-        path: logo2,
-        alignment: Alignment(width / 2, 60),
         scale: .6,
+        path: logo2,
+        effect: Effect.shake,
+        alignment: Alignment(width / 2, 60),
       ),
     ],
   );
 
   final scene2 = ColorClip(
-    size: Size(width, height),
     color: Color(0xffb33771),
     duration: Duration(seconds: 5),
     layers: [
       ImageClip(
         path: bg,
-        alignment: Alignment(width / 2, height / 2),
+        alignment: Alignment(0, 0),
       ),
       ImageClip(
         path: logo1,
-        alignment: Alignment(width / 2, height / 2 ),
+        alignment: Alignment(width / 2, height / 2 - 150),
         effect: Effect('fadeInDown', time: 1, delay: 1),
       ),
     ],
@@ -81,7 +80,14 @@ Future<void> album() async {
 
   if (file.existsSync()) await file.delete();
 
-  final video = CompositeVideoClip([scene1, scene2]);
+  final video = CompositeVideoClip(
+    size: Size(width, height),
+    transition: Transition(
+      type: TransitionType.slideright,
+      offset: 3,
+    ),
+    clips: [scene1, scene2],
+  );
 
   await video.writeVideoFile(file);
 

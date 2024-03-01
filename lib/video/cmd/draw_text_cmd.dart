@@ -5,7 +5,6 @@ String drawtextCMD(
   String text, {
   required Color fontcolor,
   required int fontsize,
-  required String fontfile,
   EdgeInsets padding = EdgeInsets.zero,
   Alignment alignment = Alignment.center,
   Color? bgcolor,
@@ -14,13 +13,13 @@ String drawtextCMD(
   int? rotate,
   Effect? effect,
 }) {
-  if (effect != null) {
-    start ??= effect.delay;
-    end ??= effect.delay + effect.time;
-  }
+  // if (effect != null) {
+  //   start ??= effect.delay;
+  //   end ??= effect.delay + effect.time;
+  // }
 
   final buffer = StringBuffer(
-    "drawtext=text='$text':fontsize=$fontsize:fontfile='$fontfile':",
+    "drawtext=text='$text':fontsize=$fontsize:",
   );
 
   if (effect == null) {
@@ -38,10 +37,10 @@ String drawtextCMD(
     buffer.write("enable='between(t,$start,$end)':");
   }
 
-  if (effect != null) {
-    buffer.write(
-        "alpha='if(lte(t,${effect.delay}),0,if(lte(t,${effect.delay + effect.time}),(t-${effect.delay})/1,1))'");
-  }
+  // if (effect != null) {
+  //   buffer.write(
+  //       "alpha='if(lte(t,${effect.delay}),0,if(lte(t,${effect.delay + effect.time}),(t-${effect.delay})/1,1))'");
+  // }
 
   return buffer.toString();
 }

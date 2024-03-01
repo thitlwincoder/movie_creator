@@ -21,7 +21,6 @@ class VideoFileClip extends VideoClip {
 
   String? startTime;
   Duration? endTime;
-  String? size;
 
   final File media;
 
@@ -54,7 +53,7 @@ class VideoFileClip extends VideoClip {
         Duration(seconds: double.parse('${format['duration']}').toInt());
     startTime = format['start_time'] as String?;
     endTime = duration;
-    size = format['size'] as String?;
+    // super.size = format['size'] as String?;
   }
 
   @override
@@ -64,16 +63,14 @@ class VideoFileClip extends VideoClip {
 
   @override
   Future<void> writeVideoFile(File output) async {
-    final file = await setFontDirectory();
-
-    if (super.duration == null) await init();
+    await setFontDirectory();
 
     final cmd = [
       '-i',
       media.path,
       if (layers?.isNotEmpty ?? false) ...[
         '-vf',
-        '"${layers!.map((e) => e.getDrawtextCMD(file, output)).join(', ')}"',
+        '"${layers!.map((e) => e.getDrawtextCMD(output)).join(', ')}"',
       ],
       if (trim != null && trim?.start != Duration.zero && trim?.end != null)
         subclipCMD(start: trim!.start, end: trim!.end, fromStart: true),

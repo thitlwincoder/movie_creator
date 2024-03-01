@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movie_flutter/core/core.dart';
+import 'package:movie_flutter/movie_flutter.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -29,25 +29,13 @@ Future<File> setFontDirectory() async {
 abstract class Clip {
   Clip();
 
-  Duration? duration;
+  Duration duration = Duration.zero;
+  Size size = Size.zero;
 
-  Future<File> setFontDirectory() async {
-    final font = await rootBundle.load('assets/Baloo2-Medium.ttf');
-    final docDir = await getApplicationDocumentsDirectory();
-    final path = p.join(docDir.path, 'Baloo2-Medium.ttf');
-    final file = File(path);
+  String prefix = '';
 
-    if (!file.existsSync()) {
-      await file.create();
-      await file.writeAsBytes(font.buffer.asUint8List(
-        font.offsetInBytes,
-        font.lengthInBytes,
-      ));
-    }
-
-    await FFmpegKitConfig.setFontDirectory(file.path);
-
-    return file;
+  Future<void> setFontDirectory() {
+    return FFmpegKitConfig.setFontDirectory('/system/fonts/');
   }
 
   Future<MemoryImage> getFrame(Duration position, File media) async {
@@ -85,7 +73,12 @@ abstract class Clip {
   String getPositions(
     Alignment align, [
     EdgeInsets? padding,
+    Transition? transition,
   ]) {
+    // if (transition == Transition.shake) {
+    //   return "x='if(lte(mod(t,2),1),random(10)*10,0)':y='if(lte(mod(t,2),1),random(10)*10,0)'";
+    // }
+
     padding ??= EdgeInsets.zero;
 
     final t = padding.top.toInt();

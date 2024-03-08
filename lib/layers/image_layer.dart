@@ -1,4 +1,4 @@
-import 'package:movie_flutter/movie_flutter.dart';
+import 'package:movie_creator/movie_creator.dart';
 
 class ImageLayer extends Layer {
   ImageLayer.asset(
@@ -46,7 +46,7 @@ class ImageLayer extends Layer {
 
     if (opacity != null) {
       buffer.write(
-        '"[1:v]format=rgba,colorchannelmixer=aa=$opacity[ov];[0:v][ov]$overlay;"',
+        '[1:v]format=rgba,colorchannelmixer=aa=$opacity[ov];[0:v][ov]$overlay;',
       );
     } else {
       buffer.write('"[0:v][1:v]$overlay;"');

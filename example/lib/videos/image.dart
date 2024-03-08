@@ -2,7 +2,7 @@
 
 // import 'package:example/main.dart';
 // import 'package:flutter/material.dart';
-// import 'package:movie_flutter/movie_flutter.dart';
+// import 'package:movie_creator/movie_creator.dart';
 // import 'package:path/path.dart' as p;
 
 // Future<void> image() async {

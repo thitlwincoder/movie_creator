@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  movie_flutter:
+  movie_creator:
     path: ../
   path: ^1.9.0
   flutter_hooks: ^0.20.5

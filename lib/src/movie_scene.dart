@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movie_flutter/movie_flutter.dart';
+import 'package:movie_creator/movie_creator.dart';
 
 class MovieScene {
   MovieScene({required this.duration, this.bgColor = Colors.black});

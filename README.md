@@ -13,7 +13,7 @@ A Very Good Project created by Very Good CLI.
 Install via `flutter pub add`:
 
 ```sh
-dart pub add movie_flutter
+dart pub add movie_creator
 ```
 
 ---

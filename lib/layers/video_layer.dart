@@ -1,4 +1,4 @@
-import 'package:movie_flutter/movie_flutter.dart';
+import 'package:movie_creator/movie_creator.dart';
 
 class VideoLayer extends Layer {
   VideoLayer.asset(

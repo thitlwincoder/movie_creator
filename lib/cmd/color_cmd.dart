@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:movie_flutter/core/core.dart';
+import 'package:movie_creator/core/core.dart';
 
 class ColorCmd {
   ColorCmd({

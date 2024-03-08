@@ -1,5 +1,5 @@
 /// A Very Good Project created by Very Good CLI.
-library movie_flutter;
+library movie_creator;
 
 import 'package:logger/logger.dart';
 

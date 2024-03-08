@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:movie_flutter/movie_flutter.dart';
+import 'package:movie_creator/movie_creator.dart';
 
 class TextCmd {
   TextCmd(

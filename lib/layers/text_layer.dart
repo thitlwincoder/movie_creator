@@ -23,18 +23,21 @@ class TextLayer extends Layer {
   int? start;
   int? end;
 
-  int? x;
-  int? y;
+  double? x;
+  double? y;
 
   Color color;
   Color bgColor;
 
   static Future<bool> export(
     List<TextLayer> textLayers,
+    int? fps,
     String input,
     String output,
   ) {
     final cmd = <String>['-i', '"$input"'];
+
+    if (fps != null) cmd.addAll(['-r', '$fps']);
 
     if (textLayers.length > 1) {
       cmd.addAll([

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:movie_creator/core/core.dart';
 
+/// color cmd
 class ColorCmd {
   ColorCmd({
     required this.color,
@@ -10,18 +11,33 @@ class ColorCmd {
     required this.duration,
   });
 
+  /// color
   final Color color;
+
+  /// height
   final int height;
+
+  /// width
   final int width;
-  final int fps;
+
+  /// fps
+  final int? fps;
+
+  /// duration
   final double? duration;
 
   @override
   String toString() {
+    /// use `StringBuffer` to add string
     final buffer = StringBuffer('color=c=${color.toHex}:')
-      ..write('s=${width}x$width:')
-      ..write('r=$fps:');
 
+      /// set height & width value
+      ..write('s=${width}x$width:');
+
+    /// set `fps` value
+    if (fps != null) buffer.write('r=$fps:');
+
+    /// set `duration` value
     if (duration != null) {
       buffer.write('d=$duration');
     }

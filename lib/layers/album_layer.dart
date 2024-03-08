@@ -31,7 +31,7 @@ class AlbumLayer extends Layer {
 
   double? duration;
 
-  Future<bool> export(String intput, String output) async {
+  Future<bool> export(String intput, int? fps, String output) async {
     var paths = <String>[];
 
     if (type == FileType.asset) {
@@ -51,8 +51,7 @@ class AlbumLayer extends Layer {
     final isSuccess = await ffmpeg.execute([
       '-framerate',
       '$f',
-      '-r',
-      '$f',
+      if (fps != null) ...['-r', '$fps'],
       '-i',
       p.join(p.dirname(paths.first), 'img_%d${p.extension(paths.first)}'),
       temp,
@@ -76,6 +75,8 @@ class AlbumLayer extends Layer {
     return ffmpeg.execute([
       '-i',
       intput,
+      '-r',
+      '$fps',
       '-i',
       temp,
       '-filter_complex',

@@ -15,16 +15,25 @@ Future<void> album() async {
   const width = 576;
   const height = 1024;
 
-  final creator = VideoCreator(height: height, width: width);
+  final creator = MovieCreator(
+    height: height,
+    width: width,
+    fps: 24,
+  );
 
-  final scene = MovieScene(duration: 6, bgColor: Color(0x0fffcc22));
+  final scene = MovieScene(
+    duration: 6,
+    bgColor: Color(0x0fffcc22),
+  );
 
   creator.addScene(scene);
 
-  final image = ImageLayer.asset(bg);
+  final image = ImageLayer.asset(
+    bg,
+  );
   scene.addLayer(image);
 
-  final text = TextLayer('Hello');
+  final text = TextLayer('Hello', x: width / 2, y: height / 2);
 
   scene.addLayer(text);
 

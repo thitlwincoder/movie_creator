@@ -1,67 +1,176 @@
-# Moviepy Flutter
+# movie_creator
 
-[![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
-[![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
-[![License: MIT][license_badge]][license_link]
+[![Uploaded By][badge]][github]
+[![License][license_badge]][license]
 
-A Very Good Project created by Very Good CLI.
+`movie_creator` is a flutter package for short video editing with just use scenes and layers like other video editing softwares.
 
-## Installation 💻
+## Getting Started
 
-**❗ In order to start using Moviepy Flutter you must have the [Flutter SDK][flutter_install_link] installed on your machine.**
+In the `pubspec.yaml` of your flutter project, add the following dependency:
 
-Install via `flutter pub add`:
+```yaml
+dependencies:
+  ...
+  movie_creator: latest
+```
+Next, we need to install this
 
 ```sh
-dart pub add movie_creator
+# Dart
+dart pub get
+
+# Flutter
+flutter pub get
 ```
 
----
+Finally, you can import and create awesome videos.
 
-## Continuous Integration 🤖
-
-Moviepy Flutter comes with a built-in [GitHub Actions workflow][github_actions_link] powered by [Very Good Workflows][very_good_workflows_link] but you can also add your preferred CI/CD solution.
-
-Out of the box, on each pull request and push, the CI `formats`, `lints`, and `tests` the code. This ensures the code remains consistent and behaves correctly as you add functionality or make changes. The project uses [Very Good Analysis][very_good_analysis_link] for a strict set of analysis options used by our team. Code coverage is enforced using the [Very Good Workflows][very_good_coverage_link].
-
----
-
-## Running Tests 🧪
-
-For first time users, install the [very_good_cli][very_good_cli_link]:
-
-```sh
-dart pub global activate very_good_cli
+```dart
+import 'package:movie_creator/movie_creator.dart';
 ```
 
-To run all unit tests:
+## Example
 
-```sh
-very_good test --coverage
+```dart
+const width = 576;
+const height = 1024;
+
+// create Creator
+final creator = MovieCreator(height: height, width: width);
+
+// create Scene
+final scene = MovieScene(duration: 5, bgColor: Colors.black);
+// add Scene to Creator
+creator.addScene(scene);
+
+// create TextLayer with x,y positions and color
+final text = TextLayer(
+  'Flutter is Awesome',
+  x: width / 2,
+  y: height / 2,
+  color: Colors.white,
+);
+// add TextLayer to scene
+scene.addLayer(text);
+
+// export video
+await creator.export(file.path);
 ```
 
-To view the generated coverage report you can use [lcov](https://github.com/linux-test-project/lcov).
+## Usage
 
-```sh
-# Generate Coverage Report
-genhtml coverage/lcov.info -o coverage/
+### MovieCreator
 
-# Open Coverage Report
-open coverage/index.html
+```dart
+final creator = MovieCreator(
+  height: height, // height of the video
+  width: width,   // width of the video
+  fps: fps,       // fps of the video
+);
 ```
 
-[flutter_install_link]: https://docs.flutter.dev/get-started/install
-[github_actions_link]: https://docs.github.com/en/actions/learn-github-actions
-[license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[license_link]: https://opensource.org/licenses/MIT
-[logo_black]: https://raw.githubusercontent.com/VGVentures/very_good_brand/main/styles/README/vgv_logo_black.png#gh-light-mode-only
-[logo_white]: https://raw.githubusercontent.com/VGVentures/very_good_brand/main/styles/README/vgv_logo_white.png#gh-dark-mode-only
-[mason_link]: https://github.com/felangel/mason
-[very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
-[very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
-[very_good_cli_link]: https://pub.dev/packages/very_good_cli
-[very_good_coverage_link]: https://github.com/marketplace/actions/very-good-coverage
-[very_good_ventures_link]: https://verygood.ventures
-[very_good_ventures_link_light]: https://verygood.ventures#gh-light-mode-only
-[very_good_ventures_link_dark]: https://verygood.ventures#gh-dark-mode-only
-[very_good_workflows_link]: https://github.com/VeryGoodOpenSource/very_good_workflows
+### MovieScene
+
+```dart
+final scene = MovieScene(
+  duration: 6,
+  bgColor: Color(0x0fffcc22),
+);
+```
+
+### TextLayer
+
+`x` and `y` are start from top left.
+
+```dart
+final text = TextLayer(
+  'Hello',
+  x: width / 2,         // x position
+  y: height / 2,        // y position
+  bgColor: Colors.red,  // background color
+  color: Colors.black,  // text color
+  rotate: 10,           // rotate 10 degree
+  fontSize: 20,         // font size
+  start: 10,            // start from 10 sec
+  end: 20,              // end in 20 sec
+);
+```
+
+### ImageLayer
+
+```dart
+// Create ImageLayer with image from asset
+final image = ImageLayer.asset('path');
+
+// Create ImageLayer with image from file path
+final image = ImageLayer.file('path');
+
+ImageLayer.asset(
+  'path',
+  x: width / 2,   // x position
+  y: height / 2,  // y position
+  height: 100     // image height
+  width: 200      // image width
+  opacity: .5     // opacity of image
+  rotate: 10      // rotate 10 degree
+);
+```
+
+### AlbumLayer
+
+```dart
+// Create AlbumLayer with image from asset
+final album = AlbumLayer.asset('path');
+
+// Create AlbumLayer with image from file path
+final album = AlbumLayer.file('path');
+
+AlbumLayer.asset(
+  'path',
+  x: width / 2,   // x position
+  y: height / 2,  // y position
+  height: 100     // image height
+  width: 200      // image width
+  duration: 10     // duration of album
+);
+```
+
+### VideoLayer
+
+```dart
+// Create ImageLayer with image from asset
+final video = VideoLayer.asset('path');
+
+// Create ImageLayer with image from file path
+final video = VideoLayer.file('path');
+
+VideoLayer.asset(
+  'path',
+  x: width / 2,   // x position
+  y: height / 2,  // y position
+  height: 100     // image height
+  width: 200      // image width
+  isMute: false   // mute audio of the video
+);
+```
+
+## Sponsoring
+
+I'm working on my packages on my free-time, but I don't have as much time as I would. If this package or any other package I created is helping you, please consider to sponsor me so that I can take time to read the issues, fix bugs, merge pull requests and add features to these packages.
+
+## Contributions
+
+Feel free to contribute to this project.
+
+If you find a bug or want a feature, but don't know how to fix/implement it, please fill an [issue][issue].
+If you fixed a bug or implemented a feature, please send a [pull request][pr].
+
+<!-- Links -->
+
+[badge]: https://img.shields.io/badge/uploaded%20by-thitlwincoder-blue
+[github]: https://github.com/thitlwincoder
+[issue]: https://github.com/thitlwincoder/movie_creator/issues
+[pr]: https://github.com/thitlwincoder/movie_creator/pulls
+[license_badge]: https://img.shields.io/github/license/thitlwincoder/movie_creator?logo=open-source-initiative&logoColor=green
+[license]: https://github.com/thitlwincoder/movie_creator/blob/main/LICENSE

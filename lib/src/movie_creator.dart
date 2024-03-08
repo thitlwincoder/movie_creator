@@ -6,18 +6,16 @@ import 'package:movie_creator/movie_creator.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class VideoCreator {
-  VideoCreator({
+class MovieCreator {
+  MovieCreator({
     required this.height,
     required this.width,
-    this.fps = 24,
-    this.debug = false,
+    this.fps,
   });
 
   final int height;
   final int width;
-  final int fps;
-  final bool debug;
+  final int? fps;
 
   List<MovieScene> scenes = [];
 
@@ -60,15 +58,15 @@ class VideoCreator {
           temp = await getTemp(ext);
 
           if (layer is ImageLayer) {
-            isSuccess = await layer.export(temps.last, temp);
+            isSuccess = await layer.export(temps.last, fps, temp);
           }
 
           if (layer is AlbumLayer) {
-            isSuccess = await layer.export(temps.last, temp);
+            isSuccess = await layer.export(temps.last, fps, temp);
           }
 
           if (layer is VideoLayer) {
-            isSuccess = await layer.export(temps.last, temp);
+            isSuccess = await layer.export(temps.last, fps, temp);
           }
 
           temps.add(temp);
@@ -78,7 +76,7 @@ class VideoCreator {
 
         if (textLayers.isNotEmpty) {
           final temp = await getTemp(ext);
-          isSuccess = await TextLayer.export(textLayers, temps.last, temp);
+          isSuccess = await TextLayer.export(textLayers, fps, temps.last, temp);
           if (!isSuccess) return;
           sceneOutputs.add(temp);
         }

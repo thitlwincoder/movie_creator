@@ -1,4 +1,4 @@
-/// A Very Good Project created by Very Good CLI.
+/// movie_creator library
 library movie_creator;
 
 import 'package:logger/logger.dart';
@@ -8,6 +8,7 @@ export 'core/core.dart';
 export 'layers/layers.dart';
 export 'src/src.dart';
 
+/// use logger for show log
 Logger logger = Logger(
   printer: PrettyPrinter(
     printEmojis: false,

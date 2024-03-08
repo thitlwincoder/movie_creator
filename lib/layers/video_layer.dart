@@ -30,7 +30,7 @@ class VideoLayer extends Layer {
 
   bool isMute;
 
-  Future<bool> export(String input, String output) async {
+  Future<bool> export(String input, int? fps, String output) async {
     var path = this.path;
 
     if (type == FileType.asset) {
@@ -56,6 +56,7 @@ class VideoLayer extends Layer {
     return ffmpeg.execute([
       '-i',
       input,
+      if (fps != null) ...['-r', '$fps'],
       '-i',
       path,
       '-filter_complex',

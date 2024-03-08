@@ -1,6 +1,6 @@
 name: movie_creator
-description: A Very Good Project created by Very Good CLI.
-version: 0.1.0+1
+description: movie_creator is a flutter package for short video editing with just use scenes and layers like other video editing softwares.
+version: 0.0.1
 publish_to: none
 
 environment:

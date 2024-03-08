@@ -17,7 +17,7 @@ class MovieScene {
   Future<bool> exportBgVideo(
     int width,
     int height,
-    int fps,
+    int? fps,
     String output,
   ) {
     final color = ColorCmd(

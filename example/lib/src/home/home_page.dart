@@ -33,6 +33,10 @@ class _HomePageState extends State<HomePage> {
             title: Text('Album'),
             onTap: album,
           ),
+          // ListTile(
+          //   title: Text('Image'),
+          //   onTap: image,
+          // ),
           // MenuItem(title: 'Text To Video', location: 'text_to_video'),
           // MenuItem(title: 'Text On Video', location: 'text_on_video'),
         ],

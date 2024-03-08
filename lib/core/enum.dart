@@ -1,0 +1,1 @@
+enum FileType { asset, file }

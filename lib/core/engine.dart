@@ -8,6 +8,8 @@ import 'package:ffmpeg_kit_flutter_full/return_code.dart';
 import 'package:flutter/services.dart';
 import 'package:movie_flutter/movie_flutter.dart';
 
+enum Execs { ffplay, ffmpeg, ffprobe }
+
 class _Engine {
   _Engine(this._execs);
 
@@ -48,7 +50,7 @@ class _Engine {
     }
   }
 
-  Future<String> execute(List<String> commands) async {
+  Future<bool> execute(List<String> commands) async {
     final enableLog = MovieFlutterConfig().enableLog;
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -64,20 +66,24 @@ class _Engine {
           if (!ReturnCode.isSuccess(code)) {
             logger.e((await session.getAllLogsAsString()) ?? '');
           }
-          return (await session.getOutput())!;
+
+          return ReturnCode.isSuccess(code);
         case Execs.ffprobe:
           final session = await FFprobeKit.execute(commands.join(' '));
-          return (await session.getOutput())!;
+          final code = await session.getReturnCode();
+          return ReturnCode.isSuccess(code);
         case Execs.ffplay:
           throw MissingPluginException('FFplay not available.');
       }
     } else {
       final process = await Process.run(_execs.name, commands);
 
-      if (process.exitCode == 1) {
+      final exitCode = process.exitCode;
+
+      if (exitCode == 1) {
         throw EngineException(process.stderr);
       }
-      return '${process.stdout}';
+      return exitCode == 0;
     }
   }
 

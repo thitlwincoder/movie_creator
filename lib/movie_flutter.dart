@@ -3,9 +3,10 @@ library movie_flutter;
 
 import 'package:logger/logger.dart';
 
+export 'cmd/cmd.dart';
 export 'core/core.dart';
+export 'layers/layers.dart';
 export 'src/src.dart';
-export 'video/video.dart';
 
 Logger logger = Logger(
   printer: PrettyPrinter(

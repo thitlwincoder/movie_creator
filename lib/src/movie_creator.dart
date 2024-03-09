@@ -71,33 +71,55 @@ class MovieCreator {
 
           temps.add(temp);
         });
+      }
 
+      if (!isSuccess) return;
+
+      if (textLayers.isNotEmpty) {
+        final temp = await getTemp(ext);
+        isSuccess = await TextLayer.export(textLayers, fps, temps.last, temp);
         if (!isSuccess) return;
+        sceneOutputs.add(temp);
+        scene.temp = temp;
+      } else {
+        scene.temp = temps.last;
 
-        if (textLayers.isNotEmpty) {
-          final temp = await getTemp(ext);
-          isSuccess = await TextLayer.export(textLayers, fps, temps.last, temp);
-          if (!isSuccess) return;
-          sceneOutputs.add(temp);
-        }
+        sceneOutputs.add(temps.last);
       }
     });
 
-    await _copySceneTempToOutput(sceneOutputs, outputPath);
+    await _copySceneTempToOutput(scenes, outputPath);
 
     await clearTemps(temps, sceneOutputs);
   }
 
   Future<bool> _copySceneTempToOutput(
-    List<String> scense,
+    List<MovieScene> scenes,
     String output,
-  ) {
+  ) async {
+    final prefix = StringBuffer();
+    final input = <String>[];
+
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < scenes.length; i++) {
+      final scene = scenes[i];
+
+      input.addAll(['-i', scene.temp!]);
+      prefix.write('[$i:v:0]');
+    }
+
+    final temp = await getTemp('.txt');
+    await File(temp).writeAsString(buffer.toString());
+
     return ffmpeg.execute([
-      for (final e in scense) ...['-i', e],
-      '-c:a',
-      'copy',
+      ...input,
+      '-filter_complex',
+      '"${prefix}concat=n=${scenes.length}:v=1:a=0[v]"',
+      '-map',
+      '"[v]"',
       output,
-      '-y'
+      '-y',
     ]);
   }
 
@@ -108,7 +130,9 @@ class MovieCreator {
 
     await Future.forEach(temps, (temp) async {
       final path = p.join(dir.path, temp);
-      await File(path).delete();
+      final file = p.basename(path);
+
+      await File(p.join(dir.path, file)).delete(recursive: true);
     });
   }
 }
@@ -116,7 +140,12 @@ class MovieCreator {
 Future<String> getTemp(String ext, {String? name}) async {
   final dir = await getTemporaryDirectory();
 
-  final filename = '${name ?? DateTime.now().toIso8601String()}$ext';
+  final dateformat = DateTime.now()
+      .toIso8601String()
+      .replaceAll('.', '-')
+      .replaceAll(':', '-');
+
+  final filename = '${name ?? dateformat}$ext';
 
   final temp = p.join(dir.path, filename);
 

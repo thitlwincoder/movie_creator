@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:movie_creator/movie_creator.dart';
 
 class MovieScene {
-  MovieScene({required this.duration, this.bgColor = Colors.black});
+  MovieScene({
+    required this.duration,
+    this.bgColor = Colors.black,
+    // this.transition,
+  });
 
   Color bgColor;
 
-  double duration;
+  int duration;
+
+  String? temp;
+
+  // Transition? transition;
 
   List<Layer> layers = [];
 

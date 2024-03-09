@@ -3,6 +3,7 @@ library movie_creator;
 
 import 'package:logger/logger.dart';
 
+export 'animations/animations.dart';
 export 'cmd/cmd.dart';
 export 'core/core.dart';
 export 'layers/layers.dart';

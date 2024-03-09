@@ -21,40 +21,29 @@ Future<void> album() async {
     fps: 24,
   );
 
-  final scene = MovieScene(
+  final scene1 = MovieScene(
     duration: 6,
-    bgColor: Color(0x0fffcc22),
-  );
+    bgColor: Colors.red,
+  )..temp = 'scene1';
 
-  creator.addScene(scene);
+  final scene2 = MovieScene(
+    duration: 6,
+    bgColor: Colors.green,
+  )..temp = 'scene2';
 
-  final image = ImageLayer.asset(
-    bg,
-  );
-  scene.addLayer(image);
+  final scene3 = MovieScene(
+    duration: 6,
+    bgColor: Colors.yellow,
+  )..temp = 'scene3';
 
-  final text = TextLayer('Hello', x: width / 2, y: height / 2);
-
-  scene.addLayer(text);
-
-  final album = AlbumLayer.asset(
-    paths: [img1, img2, img3, img4],
-    x: 250,
-    y: 300,
-    width: 500,
-    height: 300,
-    duration: 2.5,
-  );
-
-  scene.addLayer(album);
-
-  final video = VideoLayer.asset('assets/video/video1.mp4');
-
-  scene.addLayer(video);
+  creator
+    ..addScene(scene1)
+    ..addScene(scene2)
+    ..addScene(scene3);
 
   final dir = await getDirectoryPath();
 
-  final file = File(p.join(dir!, 'album.mp4'));
+  final file = File(p.join(dir!, 'example.mp4'));
 
   await creator.export(file.path);
 }

@@ -24,7 +24,7 @@ class ColorCmd {
   final int? fps;
 
   /// duration
-  final double? duration;
+  final int? duration;
 
   @override
   String toString() {
@@ -32,7 +32,7 @@ class ColorCmd {
     final buffer = StringBuffer('color=c=${color.toHex}:')
 
       /// set height & width value
-      ..write('s=${width}x$width:');
+      ..write('s=${width}x$height:');
 
     /// set `fps` value
     if (fps != null) buffer.write('r=$fps:');

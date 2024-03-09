@@ -46,7 +46,7 @@ class TextCmd {
   String toString() {
     /// use `StringBuffer` to add string
     final buffer = StringBuffer(
-      "drawtext=text='$text':fontsize=$fontsize:fontcolor=${fontcolor.toHex}:",
+      'drawtext=text="$text":fontsize=$fontsize:fontcolor=${fontcolor.toHex}:',
     );
 
     /// set `x` position
@@ -62,8 +62,8 @@ class TextCmd {
     if (bgcolor != null) buffer.write('box=1:boxcolor=${bgcolor!.toHex}:');
 
     /// set start and end duration
-    if (start != null && end != null) {
-      buffer.write("enable='between(t,$start,$end)':");
+    if (start != null || end != null) {
+      buffer.write('enable="between(t,${start ?? 0},${end ?? 'inf'})":');
     }
 
     return buffer.toString();

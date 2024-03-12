@@ -60,7 +60,6 @@ class GifLayer extends Layer {
       buffer.write('rotate=$rotate;');
     }
 
-    // buffer.write('shortest=1');
 
     return ffmpeg.execute([
       '-i',

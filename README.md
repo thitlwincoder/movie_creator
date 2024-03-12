@@ -67,6 +67,9 @@ final creator = MovieCreator(
   height: height, // height of the video
   width: width,   // width of the video
   fps: fps,       // fps of the video
+  fonts: {        // set font in global
+    'poppins': FontFile.asset('path.ttf'),
+  }
 );
 ```
 
@@ -81,19 +84,21 @@ final scene = MovieScene(
 
 ### TextLayer
 
-`x` and `y` are start from top left.
+`x` and `y` are start from top left. default `center`.
 
 ```dart
 final text = TextLayer(
   'Hello',
-  x: width / 2,         // x position
-  y: height / 2,        // y position
-  bgColor: Colors.red,  // background color
-  color: Colors.black,  // text color
-  rotate: 10,           // rotate 10 degree
-  fontSize: 20,         // font size
-  start: 10,            // start from 10 sec
-  end: 20,              // end in 20 sec
+  x: width / 2,           // x position
+  y: height / 2,          // y position
+  bgColor: Colors.red,    // background color
+  color: Colors.black,    // text color
+  rotate: 10,             // rotate 10 degree
+  fontSize: 20,           // font size
+  start: 10,              // start from 10 sec
+  end: 20,                // end in 20 sec
+  fontFamily: 'poppins',  // get font from global fonts
+  fontFile: 'path.ttf'    // direct set ttf font
 );
 ```
 
@@ -107,6 +112,26 @@ final image = ImageLayer.asset('path');
 final image = ImageLayer.file('path');
 
 ImageLayer.asset(
+  'path',
+  x: width / 2,   // x position
+  y: height / 2,  // y position
+  height: 100     // image height
+  width: 200      // image width
+  opacity: .5     // opacity of image
+  rotate: 10      // rotate 10 degree
+);
+```
+
+### GifLayer
+
+```dart
+// Create GifLayer with gif from asset
+final gif = GifLayer.asset('path');
+
+// Create GifLayer with gif from file path
+final gif = GifLayer.file('path');
+
+GifLayer.asset(
   'path',
   x: width / 2,   // x position
   y: height / 2,  // y position

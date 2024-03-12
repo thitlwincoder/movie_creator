@@ -1,6 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:movie_creator/movie_creator.dart';
 
+class FontFile {
+  FontFile.asset(this.path) : type = FileType.asset;
+  FontFile.file(this.path) : type = FileType.file;
+
+  final String path;
+  final FileType type;
+}
+
 /// text cmd
 class TextCmd {
   TextCmd(
@@ -13,6 +21,7 @@ class TextCmd {
     this.bgcolor,
     this.start,
     this.end,
+    this.fontFile,
   });
 
   /// string text
@@ -42,8 +51,10 @@ class TextCmd {
   /// end duration in sec
   final int? end;
 
-  @override
-  String toString() {
+  /// font file
+  final FontFile? fontFile;
+
+  Future<String> toFutureString() async {
     /// use `StringBuffer` to add string
     final buffer = StringBuffer(
       'drawtext=text="$text":fontsize=$fontsize:fontcolor=${fontcolor.toHex}:',
@@ -63,7 +74,17 @@ class TextCmd {
 
     /// set start and end duration
     if (start != null || end != null) {
-      buffer.write('enable="between(t,${start ?? 0},${end ?? 'inf'})":');
+      buffer.write('enable="between(t,${start ?? 0},${end ?? 'inf'})"');
+    }
+
+    if (fontFile != null) {
+      var path = fontFile!.path;
+
+      if (fontFile!.type == FileType.file) {
+        path = await moveAssetToTemp(path);
+      }
+
+      buffer.write('fontfile="$path"');
     }
 
     return buffer.toString();

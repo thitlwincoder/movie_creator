@@ -12,6 +12,8 @@ class TextLayer extends Layer {
     this.y,
     this.color = Colors.white,
     this.bgColor = Colors.black,
+    this.fontFile,
+    this.fontFamily,
   });
 
   final String text;
@@ -29,12 +31,16 @@ class TextLayer extends Layer {
   Color color;
   Color bgColor;
 
+  String? fontFamily;
+  FontFile? fontFile;
+
   static Future<bool> export(
     List<TextLayer> textLayers,
     int? fps,
     String input,
     String output,
-  ) {
+    Map<String, FontFile> fonts,
+  ) async {
     final cmd = <String>['-i', '"$input"'];
 
     if (fps != null) cmd.addAll(['-r', '$fps']);
@@ -42,15 +48,10 @@ class TextLayer extends Layer {
     if (textLayers.length > 1) {
       cmd.addAll([
         '-filter_complex',
-        [
-          for (final e in textLayers) '${getCMD(e)}',
-        ].join(',')
+        [for (final e in textLayers) await getCMD(e, fonts)].join(',')
       ]);
     } else {
-      cmd.addAll([
-        '-vf',
-        '${getCMD(textLayers.first)}',
-      ]);
+      cmd.addAll(['-vf', await getCMD(textLayers.first, fonts)]);
     }
 
     cmd.addAll(['-c:a', 'copy', '"$output"', '-y']);
@@ -58,7 +59,13 @@ class TextLayer extends Layer {
     return ffmpeg.execute(cmd);
   }
 
-  static TextCmd getCMD(TextLayer e) {
+  static Future<String> getCMD(TextLayer e, Map<String, FontFile> fonts) {
+    var fontFile = e.fontFile;
+
+    if (e.fontFamily != null) {
+      fontFile ??= fonts[e.fontFamily];
+    }
+
     return TextCmd(
       e.text,
       fontcolor: e.color,
@@ -69,6 +76,7 @@ class TextLayer extends Layer {
       rotate: e.rotate,
       x: e.x,
       y: e.y,
-    );
+      fontFile: fontFile,
+    ).toFutureString();
   }
 }

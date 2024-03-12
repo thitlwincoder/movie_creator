@@ -11,11 +11,13 @@ class MovieCreator {
     required this.height,
     required this.width,
     this.fps,
+    this.fonts = const {},
   });
 
   final int height;
   final int width;
   final int? fps;
+  final Map<String, FontFile> fonts;
 
   List<MovieScene> scenes = [];
 
@@ -23,8 +25,15 @@ class MovieCreator {
     scenes.add(scene);
   }
 
+  void addFont({
+    required FontFile fontFile,
+    required String fontFamily,
+  }) {
+    fonts[fontFamily] = fontFile;
+  }
+
   Future<void> export(String outputPath) async {
-    await FFmpegKitConfig.setFontDirectory('/system/fonts/');
+    await _setFonts();
 
     final ext = p.extension(outputPath);
 
@@ -77,7 +86,13 @@ class MovieCreator {
 
       if (textLayers.isNotEmpty) {
         final temp = await getTemp(ext);
-        isSuccess = await TextLayer.export(textLayers, fps, temps.last, temp);
+        isSuccess = await TextLayer.export(
+          textLayers,
+          fps,
+          temps.last,
+          temp,
+          fonts,
+        );
         if (!isSuccess) return;
         sceneOutputs.add(temp);
         scene.temp = temp;
@@ -88,12 +103,12 @@ class MovieCreator {
       }
     });
 
-    await _copySceneTempToOutput(scenes, outputPath);
+    await _combileSceneTempToOutput(scenes, outputPath);
 
     await clearTemps(temps, sceneOutputs);
   }
 
-  Future<bool> _copySceneTempToOutput(
+  Future<bool> _combileSceneTempToOutput(
     List<MovieScene> scenes,
     String output,
   ) async {
@@ -134,6 +149,28 @@ class MovieCreator {
 
       await File(p.join(dir.path, file)).delete(recursive: true);
     });
+  }
+
+  Future<void> _setFonts() async {
+    if (fonts.isEmpty) {
+      final paths = <String>[];
+
+      await Future.forEach(fonts.values, (e) async {
+        var path = e.path;
+
+        if (e.type == FileType.asset) {
+          path = await moveAssetToTemp(e.path);
+        }
+
+        paths.add(path);
+      });
+
+      paths.add('/system/fonts/');
+
+      await FFmpegKitConfig.setFontDirectoryList(paths);
+    } else {
+      await FFmpegKitConfig.setFontDirectory('/system/fonts/');
+    }
   }
 }
 

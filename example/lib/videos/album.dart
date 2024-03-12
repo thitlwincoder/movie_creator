@@ -24,22 +24,12 @@ Future<void> album() async {
   final scene1 = MovieScene(
     duration: 6,
     bgColor: Colors.red,
-  )..temp = 'scene1';
+  )
+    ..addLayer(GifLayer.asset('assets/imgs/gif/girl.gif'))
+    ..addLayer(GifLayer.asset('assets/imgs/gif/m.gif', x: 0, y: 0));
 
-  final scene2 = MovieScene(
-    duration: 6,
-    bgColor: Colors.green,
-  )..temp = 'scene2';
-
-  final scene3 = MovieScene(
-    duration: 6,
-    bgColor: Colors.yellow,
-  )..temp = 'scene3';
-
-  creator
-    ..addScene(scene1)
-    ..addScene(scene2)
-    ..addScene(scene3);
+  creator.addScene(scene1);
+  // ..addScene(scene2);
 
   final dir = await getDirectoryPath();
 

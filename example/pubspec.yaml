@@ -39,5 +39,6 @@ flutter:
     - assets/imgs/logo/
     - assets/imgs/album/
     - assets/imgs/bg/
+    - assets/imgs/gif/
     - assets/lottie/
     - assets/video/

@@ -78,6 +78,10 @@ class MovieCreator {
             isSuccess = await layer.export(temps.last, fps, temp);
           }
 
+          if (layer is GifLayer) {
+            isSuccess = await layer.export(temps.last, fps, temp);
+          }
+
           temps.add(temp);
         });
       }
@@ -115,17 +119,12 @@ class MovieCreator {
     final prefix = StringBuffer();
     final input = <String>[];
 
-    final buffer = StringBuffer();
-
     for (var i = 0; i < scenes.length; i++) {
       final scene = scenes[i];
 
       input.addAll(['-i', scene.temp!]);
       prefix.write('[$i:v:0]');
     }
-
-    final temp = await getTemp('.txt');
-    await File(temp).writeAsString(buffer.toString());
 
     return ffmpeg.execute([
       ...input,

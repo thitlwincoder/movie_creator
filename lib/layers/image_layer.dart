@@ -1,26 +1,27 @@
 import 'package:movie_creator/movie_creator.dart';
 
+class Alignment {
+  Alignment({this.x, this.y});
+
+  final int? x;
+  final int? y;
+}
+
 class ImageLayer extends Layer {
   ImageLayer.asset(
     this.path, {
-    this.x,
-    this.y,
-    // this.rotate,
     this.opacity,
   }) : type = FileType.asset;
 
   ImageLayer.file(
     this.path, {
-    this.x,
-    this.y,
     this.opacity,
   }) : type = FileType.file;
 
   final String path;
   final FileType type;
 
-  int? x;
-  int? y;
+  Alignment? alignment;
 
   int? height;
   int? width;
@@ -44,7 +45,7 @@ class ImageLayer extends Layer {
   // -  Rotate, flip, and skew images.
   // -  Perspective and distortion corrections.
 
-  Future<String> _initPath() async {
+  Future<String> _getPath() async {
     if (_temp != null) return _temp!;
 
     var path = this.path;
@@ -55,72 +56,65 @@ class ImageLayer extends Layer {
   }
 
   Future<void> crop({required int width, required int height}) async {
-    _temp = await _generator.crop(await _initPath(), width, height);
+    _temp = await _generator.crop(await _getPath(), width, height);
   }
 
   Future<void> rotate(int degree) async {
-    _temp = await _generator.rotate(await _initPath(), degree);
+    _temp = await _generator.rotate(await _getPath(), degree);
   }
 
   Future<void> hflip() async {
-    _temp = await _generator.hflip(await _initPath());
+    _temp = await _generator.hflip(await _getPath());
   }
 
   Future<void> vflip() async {
-    _temp = await _generator.vflip(await _initPath());
+    _temp = await _generator.vflip(await _getPath());
   }
 
   Future<void> brightness(double value) async {
-    _temp = await _generator.brightness(await _initPath(), value);
+    _temp = await _generator.brightness(await _getPath(), value);
   }
 
   Future<void> contrast(double value) async {
-    _temp = await _generator.contrast(await _initPath(), value);
+    _temp = await _generator.contrast(await _getPath(), value);
   }
 
   Future<void> saturation(double value) async {
-    _temp = await _generator.saturation(await _initPath(), value);
+    _temp = await _generator.saturation(await _getPath(), value);
   }
 
   Future<void> gamma(double value) async {
-    _temp = await _generator.gamma(await _initPath(), value);
+    _temp = await _generator.gamma(await _getPath(), value);
   }
 
   Future<bool> save(String output) async {
-    return _generator.save(await _initPath(), output);
+    return _generator.save(await _getPath(), output);
   }
 
   Future<bool> export(String input, int? fps, String output) async {
-    final overlay = 'overlay=${x ?? '(W-w)/2'}:${y ?? '(H-h)/2'}';
+    final overlay =
+        "overlay=${alignment?.x ?? '(W-w)/2'}:${alignment?.y ?? '(H-h)/2'}";
 
     final buffer = StringBuffer();
 
     if (opacity != null) {
-      buffer.write(
-        '[1:v]format=rgba,colorchannelmixer=aa=$opacity[ov];[0:v][ov]$overlay;',
-      );
+      buffer.write('"$overlay:alpha=$opacity"');
     } else {
-      buffer.write('"[0:v][1:v]$overlay;"');
+      buffer.write('"$overlay;"');
     }
 
     if (height != null || width != null) {
       buffer.write('scale=${height ?? -1}:${width ?? -1};');
     }
 
-    // if (rotate != null) {
-    //   buffer.write('rotate=$rotate;');
-    // }
-
     return ffmpeg.execute([
       '-i',
       input,
       if (fps != null) ...['-r', '$fps'],
       '-i',
-      await _initPath(),
+      await _getPath(),
       '-filter_complex',
       buffer.toString(),
-      '-c:a',
-      'copy',
       output,
       '-y'
     ]);

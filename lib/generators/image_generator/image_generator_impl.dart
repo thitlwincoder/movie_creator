@@ -75,7 +75,7 @@ class ImageGeneratorImpl implements ImageGenerator {
       '-i',
       '"$input"',
       '-vf',
-      'eq=brightness=$value',
+      '"eq=brightness=$value"',
       '"$output"',
       '-y',
     ]);
@@ -91,7 +91,7 @@ class ImageGeneratorImpl implements ImageGenerator {
       '-i',
       '"$input"',
       '-vf',
-      'eq=contrast=$value',
+      '"eq=contrast=$value"',
       '"$output"',
       '-y',
     ]);
@@ -107,7 +107,7 @@ class ImageGeneratorImpl implements ImageGenerator {
       '-i',
       '"$input"',
       '-vf',
-      'eq=saturation=$value',
+      '"eq=saturation=$value"',
       '"$output"',
       '-y',
     ]);
@@ -123,7 +123,7 @@ class ImageGeneratorImpl implements ImageGenerator {
       '-i',
       '"$input"',
       '-vf',
-      'eq=gamma=$value',
+      '"eq=gamma=$value"',
       '"$output"',
       '-y',
     ]);

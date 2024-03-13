@@ -61,7 +61,7 @@ class TextCmd {
     )
 
       /// set `x` position
-      ..write('x=${x ?? '(w-text_w)/2'}:y=${y ?? '(h-text_h)/2'}:');
+      ..write("x=${x ?? '(W-tw)/2'}:y=${y ?? '(H-th)/2'}:");
 
     /// set `bgcolor` value
     if (bgcolor != null) buffer.write('box=1:boxcolor=${bgcolor!.toHex}:');

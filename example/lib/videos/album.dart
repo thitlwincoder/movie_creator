@@ -15,6 +15,7 @@ Future<void> album() async {
   const height = 1024;
 
   final image = ImageLayer.asset(img1);
+  await image.hflip();
   await image.vflip();
 
   final creator = MovieCreator(
@@ -34,5 +35,11 @@ Future<void> album() async {
 
   final file = File(p.join(dir!, 'example.mp4'));
 
+  final watch = Stopwatch()..start();
+
   await creator.export(file.path);
+
+  watch.stop();
+
+  print('duration: ${watch.elapsed}');
 }

@@ -1,64 +1,60 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:example/src/home/home_page.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Future<void> main() async {
-  runApp(const MyApp());
+import 'services/app_preference/providers/app_settings_provider.dart';
+import 'services/localization/providers/localization_provider.dart';
+import 'services/routers/router_provider.dart';
+import 'services/themes/helpers/dark_mode/dark_mode_helper.dart';
+import 'services/themes/helpers/light_mode/light_mode_helper.dart';
+import 'services/themes/providers/theme_mode_provider.dart';
+import 'src/pages/splash/splash_screen.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+  );
+  runApp(ProviderScope(child: Initializer()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Initializer extends ConsumerWidget {
+  const Initializer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      routerConfig: router,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appSetting = ref.watch(appSettingsProvider);
+
+
+    return appSetting.when(
+      data: (value) => const AuroraApp(),
+      loading: () => const SplashScreen(),
+      error: (error, stack) => const Center(
+        child: Text('Something went wrong. Please try again later.'),
+      ),
     );
   }
 }
 
-GoRouter router = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (_, __) => HomePage(),
-      // routes: [
-      //   GoRoute(
-      //     path: 'text_to_video',
-      //     builder: (_, __) => TextToVideoPage(),
-      //   ),
-      //   GoRoute(
-      //     path: 'text_on_video',
-      //     builder: (_, __) => TextOnVideoPage(),
-      //   ),
-      // ],
-    ),
-  ],
-);
+class AuroraApp extends ConsumerWidget {
+  const AuroraApp({super.key});
 
-Future<File?> pickFile(FileType type) async {
-  final result = await FilePicker.platform.pickFiles(type: type);
-  if (result == null) return null;
-  return File(result.files.single.path!);
-}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(appThemeServiceProvider);
+    final routerConfig = ref.watch(routerProvider);
+    final locale = ref.watch(appLocalizationServiceProvider);
 
-Future<String?> getDirectoryPath() {
-  return FilePicker.platform.getDirectoryPath();
-}
-
-Future<String?> saveFile(String name, Uint8List bytes) {
-  return FileSaver.instance.saveFile(
-    name: name,
-    ext: 'jpg',
-    bytes: bytes,
-    mimeType: MimeType.jpeg,
-  );
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: routerConfig,
+      themeMode: themeMode,
+      theme: ref.watch(lightThemeProvider),
+      darkTheme: ref.watch(darkThemeProvider),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
+    );
+  }
 }

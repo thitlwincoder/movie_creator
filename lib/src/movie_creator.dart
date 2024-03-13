@@ -11,6 +11,7 @@ class MovieCreator {
     required this.height,
     required this.width,
     this.fps,
+    this.audio,
     this.fonts = const {},
   });
 
@@ -18,6 +19,7 @@ class MovieCreator {
   final int width;
   final int? fps;
   final Map<String, FontFile> fonts;
+  final String? audio;
 
   List<MovieScene> scenes = [];
 
@@ -109,7 +111,7 @@ class MovieCreator {
 
     await _combileSceneTempToOutput(scenes, outputPath);
 
-    await clearTemps(temps, sceneOutputs);
+    await clearTemps();
   }
 
   Future<bool> _combileSceneTempToOutput(
@@ -126,28 +128,31 @@ class MovieCreator {
       prefix.write('[$i:v:0]');
     }
 
-    return ffmpeg.execute([
+    final cmd = [
       ...input,
+      if (audio != null) ...['-i', audio!],
       '-filter_complex',
       '"${prefix}concat=n=${scenes.length}:v=1:a=0[v]"',
       '-map',
       '"[v]"',
+      if (audio != null) ...[
+        '-c:v',
+        'copy',
+        '-c:a',
+        'aac',
+        '-strict',
+        'experimental',
+      ],
       output,
       '-y',
-    ]);
+    ];
+
+    return ffmpeg.execute(cmd);
   }
 
-  Future<void> clearTemps(List<String> temps, List<String> sceneOutputs) async {
+  Future<void> clearTemps() async {
     final dir = await getTemporaryDirectory();
-
-    temps.addAll(sceneOutputs);
-
-    await Future.forEach(temps, (temp) async {
-      final path = p.join(dir.path, temp);
-      final file = p.basename(path);
-
-      await File(p.join(dir.path, file)).delete(recursive: true);
-    });
+    await dir.delete(recursive: true);
   }
 
   Future<void> _setFonts() async {
@@ -189,10 +194,14 @@ Future<String> getTemp(String ext, {String? name}) async {
   return temp;
 }
 
+Future<String> getTempFromPath(String path, {String? name}) async {
+  return getTemp(p.extension(path), name: name);
+}
+
 Future<String> moveAssetToTemp(String path, {String? name}) async {
   final bytes = await rootBundle.load(path);
 
-  final tmp = await getTemp(p.extension(path), name: name);
+  final tmp = await getTempFromPath(path, name: name);
   await File(tmp).writeAsBytes(bytes.buffer.asUint8List());
 
   return tmp;

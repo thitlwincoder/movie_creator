@@ -30,6 +30,18 @@ class VideoLayer extends Layer {
 
   bool isMute;
 
+  // Cutting and Trimming
+  // -  Cut and trim video clips.
+  // -  Split and join clips.
+
+  // Audio Editing
+  // -  Adjust volume levels.
+  // -  Add background music or sound effects.
+
+  // Speed and Time Effects
+  // -  Speed up or slow down clips.zz
+  // -  Create time-lapse or slow-motion effects.
+
   Future<bool> export(String input, int? fps, String output) async {
     var path = this.path;
 

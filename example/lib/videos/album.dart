@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:example/main.dart';
-import 'package:flutter/material.dart';
 import 'package:movie_creator/movie_creator.dart';
 import 'package:path/path.dart' as p;
 
@@ -15,18 +14,18 @@ Future<void> album() async {
   const width = 576;
   const height = 1024;
 
+  final image = ImageLayer.asset(img1);
+  await image.vflip();
+
   final creator = MovieCreator(
     height: height,
     width: width,
     fps: 24,
   );
 
-  final scene1 = MovieScene(
-    duration: 6,
-    bgColor: Colors.red,
-  )
-    ..addLayer(GifLayer.asset('assets/imgs/gif/girl.gif'))
-    ..addLayer(GifLayer.asset('assets/imgs/gif/m.gif', x: 0, y: 0));
+  final scene1 = MovieScene(duration: 6)..addLayer(image);
+  // ..addLayer(GifLayer.asset('assets/imgs/gif/girl.gif'))
+  // ..addLayer(GifLayer.asset('assets/imgs/gif/m.gif', x: 0, y: 0));
 
   creator.addScene(scene1);
   // ..addScene(scene2);

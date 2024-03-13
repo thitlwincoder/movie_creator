@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 export 'animations/animations.dart';
 export 'cmd/cmd.dart';
 export 'core/core.dart';
+export 'generators/generators.dart';
 export 'layers/layers.dart';
 export 'src/src.dart';
 

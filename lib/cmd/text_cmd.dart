@@ -57,24 +57,18 @@ class TextCmd {
   Future<String> toFutureString() async {
     /// use `StringBuffer` to add string
     final buffer = StringBuffer(
-      'drawtext=text="$text":fontsize=$fontsize:fontcolor=${fontcolor.toHex}:',
-    );
+      "drawtext=text='$text':fontsize=$fontsize:fontcolor=${fontcolor.toHex}:",
+    )
 
-    /// set `x` position
-    if (x != null) buffer.write('x=$x:');
-
-    /// set `y` position
-    if (y != null) buffer.write('y=$y:');
-
-    /// set `rotate` value
-    if (rotate != null) buffer.write('rotate=$y*PI/180:');
+      /// set `x` position
+      ..write('x=${x ?? '(w-text_w)/2'}:y=${y ?? '(h-text_h)/2'}:');
 
     /// set `bgcolor` value
     if (bgcolor != null) buffer.write('box=1:boxcolor=${bgcolor!.toHex}:');
 
     /// set start and end duration
     if (start != null || end != null) {
-      buffer.write('enable="between(t,${start ?? 0},${end ?? 'inf'})"');
+      buffer.write("enable='between(t,${start ?? 0},${end ?? 'inf'})'");
     }
 
     if (fontFile != null) {
@@ -84,8 +78,11 @@ class TextCmd {
         path = await moveAssetToTemp(path);
       }
 
-      buffer.write('fontfile="$path"');
+      buffer.write("fontfile='$path'");
     }
+
+    /// set `rotate` value
+    if (rotate != null) buffer.write(',rotate=$rotate*PI/180');
 
     return buffer.toString();
   }

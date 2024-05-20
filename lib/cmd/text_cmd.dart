@@ -78,7 +78,7 @@ class TextCmd {
         path = await moveAssetToTemp(path);
       }
 
-      buffer.write("fontfile='$path'");
+      buffer.write(":fontfile='$path'");
     }
 
     /// set `rotate` value

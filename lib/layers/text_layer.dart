@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_creator/generators/text_generator/text_generator.dart';
 import 'package:movie_creator/movie_creator.dart';
 
 class TextLayer extends Layer {
@@ -25,8 +26,8 @@ class TextLayer extends Layer {
   int? start;
   int? end;
 
-  double? x;
-  double? y;
+  int? x;
+  int? y;
 
   Color color;
   Color bgColor;
@@ -69,6 +70,24 @@ class TextLayer extends Layer {
   // -  Rotate text at different angles.
   // -  Flip text horizontally or vertically.
 
+  void glow() {
+    TextGenerator.instance.glow(
+      'input',
+      DrawText(
+        x: x,
+        y: y,
+        text: text,
+        fontColor: color,
+        font: fontFamily,
+        boxColor: bgColor,
+        fontSize: fontSize,
+        fontFile: fontFile?.path,
+        start: start,
+        end: end,
+      ),
+    );
+  }
+
   static Future<bool> export(
     List<TextLayer> textLayers,
     int? fps,
@@ -109,8 +128,8 @@ class TextLayer extends Layer {
       end: e.end,
       bgcolor: e.bgColor,
       rotate: e.rotate,
-      x: e.x,
-      y: e.y,
+      x: e.x?.toDouble(),
+      y: e.y?.toDouble(),
       fontFile: fontFile,
     ).toFutureString();
   }

@@ -4,11 +4,11 @@ import 'package:movie_creator/movie_creator.dart';
 class MovieScene {
   MovieScene({
     required this.duration,
-    this.bgColor = Colors.black,
+    this.color = Colors.black,
     // this.transition,
   });
 
-  Color bgColor;
+  Color color;
 
   int duration;
 
@@ -28,14 +28,14 @@ class MovieScene {
     int? fps,
     String output,
   ) {
-    final color = ColorCmd(
+    final cmd = ColorCmd(
       fps: fps,
       width: width,
-      color: bgColor,
+      color: color,
       height: height,
       duration: duration,
     );
 
-    return ffmpeg.execute(['-f', 'lavfi', '-i', '$color', output, '-y']);
+    return ffmpeg.execute(['-f', 'lavfi', '-i', '$cmd', output, '-y']);
   }
 }

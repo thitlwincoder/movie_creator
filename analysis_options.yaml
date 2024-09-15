@@ -1,4 +1,7 @@
-include: package:very_good_analysis/analysis_options.5.1.0.yaml
+analyzer:
+  errors:
+    one_member_abstracts: ignore
+include: package:very_good_analysis/analysis_options.6.0.0.yaml
 
 linter:
   rules:
@@ -7,3 +10,4 @@ linter:
     require_trailing_commas: false
     no_adjacent_strings_in_list: false
     library_private_types_in_public_api: false
+    no_leading_underscores_for_local_identifiers: false

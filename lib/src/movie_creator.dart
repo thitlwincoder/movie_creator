@@ -34,10 +34,11 @@ class MovieCreator {
     fonts[fontFamily] = fontFile;
   }
 
-  Future<void> export(String outputPath) async {
+  Future<File> export({String extension = 'mp4'}) async {
     await _setFonts();
+    await clearTemps();
 
-    final ext = p.extension(outputPath);
+    final ext = '.$extension';
 
     final temps = <String>[];
     final sceneOutputs = <String>[];
@@ -52,6 +53,7 @@ class MovieCreator {
       if (!isSuccess) return;
 
       temps.add(temp);
+      scene.temp = temp;
 
       final textLayers = <TextLayer>[];
 
@@ -69,7 +71,13 @@ class MovieCreator {
           temp = await getTemp(ext);
 
           if (layer is ImageLayer) {
-            isSuccess = await layer.export(temps.last, fps, temp);
+            isSuccess = await layer.export(
+              temps.last,
+              fps,
+              temp,
+              height,
+              width,
+            );
           }
 
           if (layer is AlbumLayer) {
@@ -109,9 +117,11 @@ class MovieCreator {
       }
     });
 
-    await _combileSceneTempToOutput(scenes, outputPath);
+    final output = await getTemp(ext);
 
-    await clearTemps();
+    await _combileSceneTempToOutput(scenes, output);
+
+    return File(output);
   }
 
   Future<bool> _combileSceneTempToOutput(
@@ -123,8 +133,12 @@ class MovieCreator {
 
     for (var i = 0; i < scenes.length; i++) {
       final scene = scenes[i];
+      final temp = scene.temp;
 
-      input.addAll(['-i', scene.temp!]);
+      if (temp != null) {
+        input.addAll(['-i', temp]);
+      }
+
       prefix.write('[$i:v:0]');
     }
 
@@ -156,39 +170,35 @@ class MovieCreator {
   }
 
   Future<void> _setFonts() async {
-    if (fonts.isEmpty) {
-      final paths = <String>[];
+    final paths = [
+      '/system/fonts',
+      '/System/Library/Fonts',
+    ];
 
+    if (fonts.isNotEmpty) {
       await Future.forEach(fonts.values, (e) async {
         var path = e.path;
 
         if (e.type == FileType.asset) {
-          path = await moveAssetToTemp(e.path);
+          path = await moveAssetToTemp(path);
         }
 
         paths.add(path);
       });
-
-      paths.add('/system/fonts/');
-
-      await FFmpegKitConfig.setFontDirectoryList(paths);
-    } else {
-      await FFmpegKitConfig.setFontDirectory('/system/fonts/');
     }
+
+    await FFmpegKitConfig.setFontDirectoryList(paths);
   }
 }
 
-Future<String> getTemp(String ext, {String? name}) async {
-  final dir = await getTemporaryDirectory();
+Future<String> getTemp(String ext, {String? name, String? dir}) async {
+  final _dir = dir ?? (await getTemporaryDirectory()).path;
 
-  final dateformat = DateTime.now()
-      .toIso8601String()
-      .replaceAll('.', '-')
-      .replaceAll(':', '-');
+  final date = DateTime.now().millisecond;
 
-  final filename = '${name ?? dateformat}$ext';
+  final filename = '${name ?? date}$ext';
 
-  final temp = p.join(dir.path, filename);
+  final temp = p.join(_dir, filename);
 
   await File(temp).create();
   return temp;

@@ -16,5 +16,5 @@ Future<void> main() async {
 
   creator.addScene(scene);
 
-  await creator.export('outputPath');
+  await creator.export();
 }

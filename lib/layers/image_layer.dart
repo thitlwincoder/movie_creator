@@ -11,22 +11,27 @@ class ImageLayer extends Layer {
   ImageLayer.asset(
     this.path, {
     this.opacity,
+    this.x,
+    this.y,
+    this.scale,
   }) : type = FileType.asset;
 
   ImageLayer.file(
     this.path, {
     this.opacity,
+    this.x,
+    this.y,
+    this.scale,
   }) : type = FileType.file;
 
   final String path;
   final FileType type;
 
-  Alignment? alignment;
-
-  int? height;
-  int? width;
+  num? x;
+  num? y;
 
   double? opacity;
+  double? scale;
 
   final _generator = ImageGenerator.instance;
 
@@ -91,20 +96,56 @@ class ImageLayer extends Layer {
     return _generator.save(await _getPath(), output);
   }
 
-  Future<bool> export(String input, int? fps, String output) async {
-    final overlay =
-        "overlay=${alignment?.x ?? '(W-w)/2'}:${alignment?.y ?? '(H-h)/2'}";
+  Future<bool> export(
+    String input,
+    int? fps,
+    String output,
+    int height,
+    int width,
+  ) async {
+    var h = '0';
+    var w = '0';
+
+    if (y == null || y == height) {
+      h = 'H-h';
+    } else {
+      final _h = height / 2;
+
+      if (y == _h) {
+        h = '(H-h)/2';
+      } else if (y! < _h) {
+        h = '(H-h)/2-${_h - y!}';
+      } else if (y! > _h) {
+        h = '(H-h)/2+${y! - _h}';
+      }
+    }
+
+    if (x == null || x == width) {
+      w = 'W-w';
+    } else {
+      final _w = width / 2;
+
+      if (x == _w) {
+        w = '(W-w)/2';
+      } else if (x! < _w) {
+        w = '(W-w)/2-${_w - x!}';
+      } else if (x! > _w) {
+        w = '(W-w)/2+${x! - _w}';
+      }
+    }
+
+    final overlay = 'overlay=$w:$h';
 
     final buffer = StringBuffer();
 
     if (opacity != null) {
       buffer.write('"$overlay:alpha=$opacity"');
     } else {
-      buffer.write('"$overlay;"');
+      buffer.write('"$overlay,"');
     }
 
-    if (height != null || width != null) {
-      buffer.write('scale=${height ?? -1}:${width ?? -1};');
+    if (scale != null) {
+      buffer.write('"scale=iw*$scale:ih*$scale;"');
     }
 
     return ffmpeg.execute([

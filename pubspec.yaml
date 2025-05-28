@@ -1,15 +1,21 @@
 name: movie_creator
 description: movie_creator is a flutter package for short video editing with just use scenes and layers like other video editing softwares.
 version: 0.0.1
-publish_to: none
+repository: https://github.com/thitlwincoder/movie_creator
+issue_tracker: https://github.com/thitlwincoder/movie_creator/issues
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
 
 funding:
   - https://paypal.me/thitlwinsoe260
   - https://ko-fi.com/thitlwincoder
+
+topics:
+  - movie
+  - creator
+  - ffmpeg
 
 dependencies:
   async: ^2.11.0
@@ -22,4 +28,4 @@ dependencies:
   logger: ^2.4.0
 
 dev_dependencies:
-  very_good_analysis: ^6.0.0
+  very_good_analysis: ^8.0.0

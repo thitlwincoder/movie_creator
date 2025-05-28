@@ -6,13 +6,13 @@ import 'package:movie_creator/movie_creator.dart';
 
 Future<File> main() {
   var bg1 = Assets.imgs.bg.a05.path;
-  var bg2 = Assets.imgs.bg.a04.path;
+  // var bg2 = Assets.imgs.bg.a04.path;
   var logo2 = Assets.imgs.logo.logo2.path;
   var cloud = Assets.imgs.cloud.path;
   var mars = Assets.imgs.mars.path;
   var rock = Assets.imgs.rock.path;
   var title = Assets.imgs.title.path;
-  var audio = Assets.audio.a05;
+  // var audio = Assets.audio.a05;
 
   var width = 576;
   var height = 1024;

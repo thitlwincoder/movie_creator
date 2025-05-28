@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter_full/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_kit_config.dart';
 import 'package:flutter/services.dart';
 import 'package:movie_creator/movie_creator.dart';
 import 'package:path/path.dart' as p;

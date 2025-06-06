@@ -1,41 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:movie_creator/movie_creator.dart';
+import 'package:movie_creator/src/movie_scene_impl.dart';
 
-class MovieScene {
-  MovieScene({
-    required this.duration,
-    this.color = Colors.black,
-    // this.transition,
-  });
+abstract class MovieScene {
+  factory MovieScene({
+    required int duration,
+    Color? color,
+  }) = MovieSceneImpl;
 
-  Color color;
+  String? get temp;
 
-  int duration;
+  set temp(String? value);
 
-  String? temp;
+  List<Layer> get layers;
 
-  // Transition? transition;
+  set layers(List<Layer> value);
 
-  List<Layer> layers = [];
-
-  void addLayer(Layer layer) {
-    layers.add(layer);
-  }
+  void addLayer(Layer layer);
 
   Future<bool> exportBgVideo(
     int width,
     int height,
     int? fps,
     String output,
-  ) {
-    final cmd = ColorCmd(
-      fps: fps,
-      width: width,
-      color: color,
-      height: height,
-      duration: duration,
-    );
-
-    return ffmpeg.execute(['-f', 'lavfi', '-i', '$cmd', output, '-y']);
-  }
+  );
 }

@@ -1,6 +1,7 @@
 import 'package:movie_creator/filters/filter.dart';
 import 'package:movie_creator/generators/text_generator/text_generator.dart';
 import 'package:movie_creator/movie_creator.dart';
+import 'package:movie_creator/utils/temp.dart';
 
 class TextGeneratorImpl implements TextGenerator {
   @override

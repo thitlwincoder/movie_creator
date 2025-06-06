@@ -1,5 +1,5 @@
 /// movie_creator library
-library movie_creator;
+library;
 
 import 'package:logger/logger.dart';
 

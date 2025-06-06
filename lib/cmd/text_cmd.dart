@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:movie_creator/movie_creator.dart';
+import 'package:movie_creator/utils/temp.dart';
 
 class FontFile {
   FontFile.asset(this.path) : type = FileType.asset;

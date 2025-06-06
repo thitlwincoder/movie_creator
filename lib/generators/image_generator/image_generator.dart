@@ -1,7 +1,7 @@
 import 'package:movie_creator/generators/image_generator/image_generator_impl.dart';
 
 abstract class ImageGenerator {
-  static ImageGenerator get instance => ImageGeneratorImpl();
+  factory ImageGenerator() = ImageGeneratorImpl;
 
   Future<String> crop(String input, int width, int height);
 

@@ -1,4 +1,5 @@
 import 'package:movie_creator/movie_creator.dart';
+import 'package:movie_creator/utils/temp.dart';
 
 class ImageGeneratorImpl implements ImageGenerator {
   ImageGeneratorImpl();

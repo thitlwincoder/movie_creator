@@ -84,7 +84,6 @@ class Transition {
   }
 
   int setOffset(int duration, [int previousOffset = 0]) {
-    // ignore: join_return_with_assignment
     offset = duration + previousOffset - this.duration;
 
     return offset!;

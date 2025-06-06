@@ -10,14 +10,14 @@ class MovieCreatorImpl implements MovieCreator {
     required this.height,
     required this.width,
     this.fps,
-    this.audio,
     Map<String, FontFile>? fonts,
-  }) : fonts = fonts ?? {};
+    List<MovieScene>? scenes,
+  })  : scenes = scenes ?? [],
+        fonts = fonts ?? {};
 
   final int? fps;
   final int width;
   final int height;
-  final String? audio;
   final Map<String, FontFile> fonts;
 
   List<MovieScene> scenes = [];
@@ -149,19 +149,10 @@ class MovieCreatorImpl implements MovieCreator {
 
     final cmd = <String>[
       ...input,
-      if (audio != null) ...['-i', audio!],
       '-filter_complex',
       '"${prefix}concat=n=${scenes.length}:v=1:a=0[v]"',
       '-map',
       '"[v]"',
-      if (audio != null) ...[
-        '-c:v',
-        'copy',
-        '-c:a',
-        'aac',
-        '-strict',
-        'experimental',
-      ],
       output,
       '-y',
     ];

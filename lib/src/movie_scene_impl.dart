@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:movie_creator/movie_creator.dart';
 
 class MovieSceneImpl implements MovieScene {
-  MovieSceneImpl({required this.duration, Color? color})
-      : color = color ?? Colors.black;
+  MovieSceneImpl({
+    required this.duration,
+    Color? color,
+    List<Layer>? layers,
+  })  : _layers = layers ?? [],
+        color = color ?? Colors.black;
 
   final int duration;
 

@@ -73,7 +73,12 @@ class ImageLayerImpl implements ImageLayer {
 
   @override
   Future<bool> export(
-      String input, int? fps, String output, int height, int width) async {
+    String input,
+    int? fps,
+    String output,
+    int height,
+    int width,
+  ) async {
     var h = '0';
     var w = '0';
 

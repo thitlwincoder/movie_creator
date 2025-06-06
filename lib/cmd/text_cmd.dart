@@ -56,35 +56,26 @@ class TextCmd {
   final FontFile? fontFile;
 
   Future<String> toFutureString() async {
-    /// use `StringBuffer` to add string
-    final buffer = StringBuffer(
-      "drawtext=text='$text':fontsize=$fontsize:fontcolor=${fontcolor.toHex}:",
-    )
+    String? fontFile;
 
-      /// set `x` position
-      ..write("x=${x ?? '(W-tw)/2'}:y=${y ?? '(H-th)/2'}:");
+    if (this.fontFile != null) {
+      fontFile = this.fontFile!.path;
 
-    /// set `bgcolor` value
-    if (bgcolor != null) buffer.write('box=1:boxcolor=${bgcolor!.toHex}:');
-
-    /// set start and end duration
-    if (start != null || end != null) {
-      buffer.write("enable='between(t,${start ?? 0},${end ?? 'inf'})'");
-    }
-
-    if (fontFile != null) {
-      var path = fontFile!.path;
-
-      if (fontFile!.type == FileType.file) {
-        path = await moveAssetToTemp(path);
+      if (this.fontFile!.type == FileType.file) {
+        fontFile = await moveAssetToTemp(fontFile);
       }
-
-      buffer.write(":fontfile='$path'");
     }
 
-    /// set `rotate` value
-    if (rotate != null) buffer.write(',rotate=$rotate*PI/180');
-
-    return buffer.toString();
+    return DrawText(
+      text: text,
+      rotate: rotate,
+      boxColor: bgcolor,
+      fontSize: fontsize,
+      x: x ?? '(W-tw)/2',
+      y: y ?? '(H-th)/2',
+      fontFile: fontFile,
+      fontColor: fontcolor,
+      box: bgcolor != null,
+    ).toString();
   }
 }

@@ -8,8 +8,8 @@ abstract class MovieCreator {
     required int height,
     required int width,
     int? fps,
-    String? audio,
     Map<String, FontFile>? fonts,
+    List<MovieScene>? scenes,
   }) = MovieCreatorImpl;
 
   void addScene(MovieScene scene);

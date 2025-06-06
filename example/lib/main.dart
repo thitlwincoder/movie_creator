@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:example/album.dart' as album;
-import 'package:example/image.dart' as image;
-import 'package:example/player.dart';
+import 'album.dart' as album;
+import 'image.dart' as image;
+import 'player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';

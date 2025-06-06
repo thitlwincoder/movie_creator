@@ -6,6 +6,7 @@ abstract class MovieScene {
   factory MovieScene({
     required int duration,
     Color? color,
+    List<Layer>? layers,
   }) = MovieSceneImpl;
 
   String? get temp;

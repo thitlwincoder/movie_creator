@@ -5,8 +5,8 @@ repository: https://github.com/thitlwincoder/movie_creator
 issue_tracker: https://github.com/thitlwincoder/movie_creator/issues
 
 environment:
-  sdk: ^3.5.0
-  flutter: ">=3.24.0"
+  sdk: ^3.8.1
+  flutter: ">=1.17.0"
 
 funding:
   - https://paypal.me/thitlwinsoe260
@@ -18,10 +18,10 @@ topics:
   - ffmpeg
 
 dependencies:
-  async: ^2.11.0
-
   flutter:
     sdk: flutter
+
+  async: ^2.11.0
   path: ^1.9.0
   path_provider: ^2.1.4
   logger: ^2.4.0

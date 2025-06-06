@@ -35,6 +35,7 @@ class DrawText extends Filter {
     this.duration,
     this.start,
     this.end,
+    this.rotate,
   });
 
   String? text;
@@ -61,11 +62,12 @@ class DrawText extends Filter {
   int? startNumber;
   int? tabSize;
   String? textfile;
-  int? x;
-  int? y;
+  Object? x;
+  Object? y;
   int? duration;
   int? start;
   int? end;
+  int? rotate;
 
   @override
   String toString() {
@@ -97,6 +99,7 @@ class DrawText extends Filter {
     cmd['x'] = x;
     cmd['y'] = y;
     cmd['duration'] = duration;
+    if (rotate != null) cmd['rotate'] = '$rotate*PI/180';
 
     if (start != null || end != null) {
       cmd['enable'] = 'between(t,${start ?? 0},${end ?? 'inf'})';
@@ -121,11 +124,11 @@ class BoxBorderWidth {
   });
 
   factory BoxBorderWidth.all(int width) => BoxBorderWidth(
-        top: width,
-        bottom: width,
-        left: width,
-        right: width,
-      );
+    top: width,
+    bottom: width,
+    left: width,
+    right: width,
+  );
 
   factory BoxBorderWidth.symmetric({int? vertical, int? horizontal}) =>
       BoxBorderWidth(
